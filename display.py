@@ -20,6 +20,7 @@ elif font_choice == 7:
 else:
     project_font = "font/Open_Sans/OpenSans-SemiBold.ttf"
 
+print(project_font)
 
 font8 = ImageFont.truetype(project_font, 8)
 font12 = ImageFont.truetype(project_font, 12)
@@ -49,6 +50,7 @@ class Display:
             return
         # im_icon = im_icon.convert("LA")
         im_icon = im_icon.resize((l, h))
+        c="b"
         if c == "b":
             self.im_black.paste(im_icon, (x, y), im_icon)
         else:

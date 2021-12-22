@@ -245,6 +245,7 @@ def main():
             epd.Clear()
             time.sleep(2)
             print("\tPrinting...")
+            display.im_black.save("weather.png")
             epd.display(epd.getbuffer(display.im_black))
             print("Done")
             time.sleep(2)
