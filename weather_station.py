@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-###########################################
 #
 # Author : Aerodynamics
 # Date : 21 jan 2021
