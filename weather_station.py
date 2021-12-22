@@ -14,8 +14,8 @@ from news import *
 from display import *
 import json
 
-lat = "48.85" # Paris, France :)
-lon = "2.39"
+lat = "36.9"
+lon = "121.9"
 api_key_weather = "b69ed8db8927bd983bf8388c067c5626"
 api_key_news = "72064d803ca1466ca192b1031038cbbc"
 debug = 0 # If debug != 0 -> debug on
