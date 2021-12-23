@@ -18,8 +18,8 @@ lat = "36.9"
 lon = "121.9"
 api_key_weather = "b69ed8db8927bd983bf8388c067c5626"
 api_key_news = "72064d803ca1466ca192b1031038cbbc"
-debug = 0 # If debug != 0 -> debug on
-if debug ==0:
+debug = 0  # If debug != 0 -> debug on
+if debug == 0:
     import epd5in65f
 else:
     pass
@@ -59,7 +59,7 @@ def main():
 
     ############################################################################
     # NEXT HOUR RAIN
-    try :
+    try:
         data_rain = weather.rain_next_hour()
 
         # FRAME
@@ -73,7 +73,7 @@ def main():
             display.draw_black.text((20 + i * 50, 195), data_rain[i][0], fill=0, font=font16)
             if data_rain[i][1] != 0:
                 display.draw_red.rectangle((20 + i * 50, 175, 20 + (i + 1) * 50, 195), fill=0)
-    except:
+    except Exception:
         pass
 
     ############################################################################
