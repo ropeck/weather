@@ -265,10 +265,7 @@ if __name__ == "__main__":
     global been_reboot
     been_reboot=1
 
-    if debug==0:
-        epd = epd5in65f.EPD()
-    else :
-        pass
+    epd = epd5in65f.EPD()
 
     while True:
         try:
@@ -308,6 +305,6 @@ if __name__ == "__main__":
             exit()
         except Exception as e:
             current_time = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
-            print("PROBLEM OCCURED WHILE REFRESHING - NEXT TRY 1000s - @" + current_time)
+            print("PROBLEM OCCURRED WHILE REFRESHING - NEXT TRY 1000s - @" + current_time)
             print(str(e))
             time.sleep(1000)
