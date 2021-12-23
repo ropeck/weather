@@ -36,6 +36,7 @@ class Display:
         self.im_red = Image.new('1', (600, 448), 255)
         self.draw_black = ImageDraw.Draw(self.im_black)
         self.draw_red = ImageDraw.Draw(self.im_red)
+        self.draw_red = self.draw_black
 
     def draw_circle(self, x, y, r, c):
         if c == "b":
