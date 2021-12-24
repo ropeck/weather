@@ -35,7 +35,7 @@ class Weather:
 
     def update(self):
         self.data = requests.get(
-            f"https://api.openweathermap.org/data/2.5/onecall?lat={self.latitude}&lon={self.longitude}&lang=fr&appid={self.api_key}&units=standard").json()
+            f"https://api.openweathermap.org/data/2.5/onecall?lat={self.latitude}&lon={self.longitude}&lang=fr&appid={self.api_key}&units=imperial").json()
         return self.data
 
     def current_time(self):

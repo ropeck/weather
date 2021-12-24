@@ -35,13 +35,13 @@ def map_resize(val, in_mini, in_maxi, out_mini, out_maxi):
 def main():
     ############################################################################
     # FRAME
-    display.draw_black.rectangle((5, 5, 795, 475), fill=255, outline=0, width=2)  # INNER FRAME
+    display.draw_black.rectangle((5, 5, 795, 475), fill='white', outline=0, width=2)  # INNER FRAME
     display.draw_black.line((540, 5, 540, 350), fill=0, width=1)  # VERTICAL SEPARATION
     display.draw_black.line((350, 5, 350, 350), fill=0, width=1)  # VERTICAL SEPARATION slim
     display.draw_black.line((5, 350, 795, 350), fill=0, width=1)  # HORIZONTAL SEPARATION
 
     # UPDATED AT
-    display.draw_black.text((10, 8), "Mis  jour le " + weather.current_time(), fill=0, font=font8)
+    display.draw_black.text((10, 8), "Updated at " + weather.current_time(), fill='orange', font=font8, color='orange')
 
     ############################################################################
     # CURRENT WEATHER
