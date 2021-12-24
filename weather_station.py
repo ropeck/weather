@@ -45,8 +45,6 @@ def main():
 
     ############################################################################
     # CURRENT WEATHER
-    display.draw_black.text((10, 15), str(weather.station_temp()), fill=0, font=font96, color='black')
-    display.draw_black.text((10, 100), str(weather.station_daily_rain()), fill=0, font=font96, color='blue')
     display.draw_icon(20, 55, "r", 75, 75,
                       weather.weather_description(weather.current_weather())[0])  # CURRENT WEATHER ICON
     display.draw_black.text((120, 15), weather.current_temp(), fill=0, font=font48)  # CURRENT TEMP
@@ -58,6 +56,9 @@ def main():
     display.draw_black.text((160, 110), weather.current_sunrise(), fill=0, font=font16)  # SUNRISE TIME
     display.draw_icon(220, 105, "b", 35, 35, "sunset")  # SUNSET ICON
     display.draw_black.text((260, 110), weather.current_sunset(), fill=0, font=font16)  # SUNSET TIME
+    
+    display.draw_black.text((10, 15), str(weather.station_temp()), fill=0, font=font96, color='black')
+    display.draw_black.text((10, 100), str(weather.station_daily_rain()), fill='blue', font=font96, color='blue')
 
     ############################################################################
     # NEXT HOUR RAIN
