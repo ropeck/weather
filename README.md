@@ -1,5 +1,10 @@
 # weather
 
+<a href="images/weatherstation.jpg">
+<img src="images/weatherstation_th.jpg">
+</a>
+
+
 * weather station api details
 
 https://docs.google.com/document/d/1eKCnKXI9xnoMGRRzOL1xPCBihNV2rOet08qpE_gArAY/edit
