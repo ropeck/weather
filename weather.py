@@ -28,10 +28,10 @@ class Weather:
         ).json()
 
     def station_daily_rain(self):
-        return self.station_data()["observations"]["imperial"]["precipTotal"]
+        return self.station_data["observations"][0]["imperial"]["precipTotal"]
 
     def station_temp(self):
-        return self.station_data()["observations"]["imperial"]["temp"]
+        return self.station_data["observations"][0]["imperial"]["temp"]
 
     def update(self):
         self.data = requests.get(

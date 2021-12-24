@@ -45,8 +45,8 @@ def main():
 
     ############################################################################
     # CURRENT WEATHER
-    display.draw_black.text((10, 15), weather.station_temp(), fill=0, font=font96, color='black')
-    display.draw_black.text((10, 100), weather.station_daily_rain(), fill=0, font=font96, color='blue')
+    display.draw_black.text((10, 15), str(weather.station_temp()), fill=0, font=font96, color='black')
+    display.draw_black.text((10, 100), str(weather.station_daily_rain()), fill=0, font=font96, color='blue')
     display.draw_icon(20, 55, "r", 75, 75,
                       weather.weather_description(weather.current_weather())[0])  # CURRENT WEATHER ICON
     display.draw_black.text((120, 15), weather.current_temp(), fill=0, font=font48)  # CURRENT TEMP
@@ -292,8 +292,8 @@ if __name__ == "__main__":
             weather.update()
             print("Weather Updated")
             # pollution.update(lat, lon, api_key_weather)
-            # news.update(api_key_news)
-            # print("News Updated")
+            news.update(api_key_news)
+            print("News Updated")
             main()
             time.sleep(3600)
         except KeyboardInterrupt:
@@ -305,7 +305,7 @@ if __name__ == "__main__":
             else :
                 pass
             exit()
-        except Exception as e:
+        except IOException as e:
             current_time = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
             print("PROBLEM OCCURRED WHILE REFRESHING - NEXT TRY 1000s - @" + current_time)
             print(str(e))
