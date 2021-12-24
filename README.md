@@ -107,4 +107,4 @@ api.openweathermap.org/data/2.5/forecast?lat=36.973396&lon=-121.908257&appid=b69
     {
 
 ```
-<img src="todo-1.jpg">
+<img src="images/todo-1.jpg">
