@@ -51,4 +51,10 @@ https://www.pwsweather.com/
 Cumulus and Meteotemplate 
 
 
+# openweathermap
+b69ed8db8927bd983bf8388c067c5626
+api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}
+
+api.openweathermap.org/data/2.5/forecast?lat=36.973396&lon=-121.908257&appid=b69ed8db8927bd983bf8388c067c5626
+
 <img src="todo-1.jpg">
