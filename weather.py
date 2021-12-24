@@ -19,6 +19,17 @@ class Weather:
                                 round(self.data["daily"][0]["temp"]["day"], 0)]
         pass
 
+    def station_data(self):
+        return requests.get(
+            "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb"
+        ).json()
+
+    def station_daily_rain(self):
+        return station_data()["observations"]["imperial"]["precipTotal"]
+
+    def station_temp(self):
+        return station_data()["observations"]["imperial"]["temp"]
+
     def update(self):
         self.data = requests.get(
             f"https://api.openweathermap.org/data/2.5/onecall?lat={self.latitude}&lon={self.longitude}&lang=fr&appid={self.api_key}&units=standard").json()

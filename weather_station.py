@@ -45,6 +45,8 @@ def main():
 
     ############################################################################
     # CURRENT WEATHER
+    display.draw_black.text((10, 15), weather.station_temp(), fill=0, font=font96, color='black')
+    display.draw_black.text((10, 100), weather.station_daily_rain(), fill=0, font=font96, color='blue')
     display.draw_icon(20, 55, "r", 75, 75,
                       weather.weather_description(weather.current_weather())[0])  # CURRENT WEATHER ICON
     display.draw_black.text((120, 15), weather.current_temp(), fill=0, font=font48)  # CURRENT TEMP
