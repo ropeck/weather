@@ -55,6 +55,56 @@ Cumulus and Meteotemplate
 b69ed8db8927bd983bf8388c067c5626
 api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={API key}
 
+http://
 api.openweathermap.org/data/2.5/forecast?lat=36.973396&lon=-121.908257&appid=b69ed8db8927bd983bf8388c067c5626
 
+
+```
+{
+  "cod": "200",
+  "message": 0,
+  "cnt": 40,
+  "list": [
+    {
+      "dt": 1640336400,
+      "main": {
+        "temp": 52.75,
+        "feels_like": 52.11,
+        "temp_min": 50.9,
+        "temp_max": 52.75,
+        "pressure": 1006,
+        "sea_level": 1006,
+        "grnd_level": 1003,
+        "humidity": 93,
+        "temp_kf": 1.03
+      },
+      "weather": [
+        {
+          "id": 500,
+          "main": "Rain",
+          "description": "light rain",
+          "icon": "10n"
+        }
+      ],
+      "clouds": {
+        "all": 74
+      },
+      "wind": {
+        "speed": 3.96,
+        "deg": 133,
+        "gust": 8.61
+      },
+      "visibility": 10000,
+      "pop": 0.42,
+      "rain": {
+        "3h": 0.7
+      },
+      "sys": {
+        "pod": "n"
+      },
+      "dt_txt": "2021-12-24 09:00:00"
+    },
+    {
+
+```
 <img src="todo-1.jpg">
