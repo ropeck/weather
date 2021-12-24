@@ -2,7 +2,7 @@
 
 import time
 
-import memoize as memoize
+from memoize import mproperty
 import requests
 import locale
 
@@ -21,7 +21,7 @@ class Weather:
                                 round(self.data["daily"][0]["temp"]["day"], 0)]
         pass
 
-    @memoize
+    @mproperty
     def station_data(self):
         return requests.get(
             "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb"

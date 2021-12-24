@@ -292,8 +292,8 @@ if __name__ == "__main__":
             weather.update()
             print("Weather Updated")
             # pollution.update(lat, lon, api_key_weather)
-            news.update(api_key_news)
-            print("News Updated")
+            # news.update(api_key_news)
+            # print("News Updated")
             main()
             time.sleep(3600)
         except KeyboardInterrupt:
