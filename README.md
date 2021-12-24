@@ -1,5 +1,10 @@
 # weather
 
+<a href="images/weatherstation.jpg">
+<img src="images/weatherstation_th.jpg">
+</a>
+
+
 * weather station api details
 
 https://docs.google.com/document/d/1eKCnKXI9xnoMGRRzOL1xPCBihNV2rOet08qpE_gArAY/edit
@@ -107,4 +112,4 @@ api.openweathermap.org/data/2.5/forecast?lat=36.973396&lon=-121.908257&appid=b69
     {
 
 ```
-<img src="todo-1.jpg">
+<img src="images/todo-1.jpg">
