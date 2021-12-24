@@ -225,18 +225,19 @@ def main():
 
     ############################################################################
     # NEWS UPDATE
+    news_w = 400
     news_selected = news.selected_title()
-    display.draw_black.text((550, 15), "NEWS", fill=0, font=font24)
+    display.draw_black.text((news_w, 15), "NEWS", fill=0, font=font24)
     for i in range(len(news_selected)):
         if len(news_selected) == 1:
-            display.draw_black.text((550, 40), news_selected[0], fill=0, font=font14)
+            display.draw_black.text((news_w, 40), news_selected[0], fill=0, font=font14)
         elif len(news_selected[i]) <= 3 :
             for j in range(len(news_selected[i])):
-                display.draw_black.text((550, 40 + j * 15 + i * 60), news_selected[i][j], fill=0, font=font14)
+                display.draw_black.text((news_w, 40 + j * 15 + i * 60), news_selected[i][j], fill=0, font=font14)
         else:
             for j in range(2):
-                display.draw_black.text((550, 40 + j * 15 + i * 60), news_selected[i][j], fill=0, font=font14)
-            display.draw_black.text((550, 40 + 2 * 15 + i * 60), news_selected[i][2] + "[...]", fill=0, font=font14)
+                display.draw_black.text((news_w, 40 + j * 15 + i * 60), news_selected[i][j], fill=0, font=font14)
+            display.draw_black.text((news_w, 40 + 2 * 15 + i * 60), news_selected[i][2] + "[...]", fill=0, font=font14)
 
 
 

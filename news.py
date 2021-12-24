@@ -6,10 +6,11 @@ import textwrap
 class News:
     def __init__(self):
         pass
-
     def update(self, api_id):
         self.news_list = requests.get(
-            f"https://newsapi.org/v2/top-headlines?sources=google-news-fr&apiKey={api_id}").json()
+            #f"https://newsapi.org/v2/top-headlines?sources=google-news-fr&apiKey={api_id}").json()
+            f"https://newsapi.org/v2/top-headlines?sources=google-news&apiKey={api_id}").json()
+            #f"https://newsapi.org/v2/top-headlines?country=us&apiKey={api_id}").json()
         return self.news_list
 
     def selected_title(self):
