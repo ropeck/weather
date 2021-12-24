@@ -15,7 +15,10 @@ from display import *
 import json
 
 lat = "36.9"
-lon = "121.9"
+lon = "-121.9"
+# TODO: use lat/long from wunderground PWS data
+# TODO: add PWS to config data
+
 api_key_weather = "b69ed8db8927bd983bf8388c067c5626"
 api_key_news = "72064d803ca1466ca192b1031038cbbc"
 debug = 0  # If debug != 0 -> debug on
@@ -45,8 +48,6 @@ def main():
 
     ############################################################################
     # CURRENT WEATHER
-    display.draw_black.text((10, 15), str(weather.station_temp()), fill=0, font=font96, color='black')
-    display.draw_black.text((10, 100), str(weather.station_daily_rain()), fill=0, font=font96, color='blue')
     display.draw_icon(20, 55, "r", 75, 75,
                       weather.weather_description(weather.current_weather())[0])  # CURRENT WEATHER ICON
     display.draw_black.text((120, 15), weather.current_temp(), fill=0, font=font48)  # CURRENT TEMP
@@ -213,6 +214,8 @@ def main():
                                x[i + 1] + 400,
                                map_resize(temperature[i + 1], min(temperature), max(temperature), maxi, mini)),
                               fill=0, width=2)
+    display.draw_black.text((10, 15), str(weather.station_temp()), fill=0, font=font96, color='black')
+    display.draw_black.text((10, 100), str(weather.station_daily_rain()), fill='blue', font=font96, color='blue')
 
     ############################################################################
     # ALERT AND POLLUTION
