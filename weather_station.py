@@ -245,6 +245,7 @@ def main():
     print("Updating screen...")
 
     try:
+        display.im_black.save("weather.png")
         print("\tClearing Screen...")
         if debug ==0:
             # display.im_black.show()
@@ -254,7 +255,6 @@ def main():
             epd.Clear()
             time.sleep(2)
             print("\tPrinting...")
-            display.im_black.save("weather.png")
             epd.display(epd.getbuffer(display.im_black))
             print("Done")
             time.sleep(2)
