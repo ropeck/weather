@@ -27,7 +27,7 @@ class Weather:
         return self.station_data["observations"][0]["imperial"]["temp"]
 
     def update(self):
-        self.station_data_source = requests.get(
+        self.station_data = requests.get(
             "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
         ).json()
         self.data = requests.get(
