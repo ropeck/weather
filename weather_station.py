@@ -228,7 +228,7 @@ def main():
     news_w = 385
     news_selected = news.selected_title()
     display.draw_black.text((news_w, 15), "NEWS", fill='green', font=font24)
-    for i in range(len(news_selected)):
+    for i in range(len(news_selected[:3])):
         if len(news_selected) == 1:
             display.draw_black.text((news_w, 40), news_selected[0], fill='green', font=font14)
         elif len(news_selected[i]) <= 3 :
