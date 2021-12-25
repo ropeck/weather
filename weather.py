@@ -31,7 +31,7 @@ class Weather:
             "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
         ).json()
         obs = self.station_data["observations"][0]
-        forecast_api = f"https://api.openweathermap.org/data/2.5/onecall?lat={obs["lat"]}&lon={obs["lon"]}&appid={self.api_key}&units=imperial"
+        forecast_api = f"https://api.openweathermap.org/data/2.5/onecall?lat={obs['lat']}&lon={obs['lon']}&appid={self.api_key}&units=imperial"
         print (forecast_api)
         self.data = requests.get(forecast_api).json()
         return self.data
