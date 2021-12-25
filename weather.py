@@ -13,19 +13,11 @@ class Weather:
         self.latitude = latitude
         self.longitude = longitude
         self.api_key = api_id
-        self.prevision = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]
-        self.data = requests.get(
-            f"https://api.openweathermap.org/data/2.5/onecall?lat={self.latitude}&lon={self.longitude}&lang=fr&appid={self.api_key}").json()
-        self.prevision[0] = self.data["daily"][0]["dt"]
+        self.prevision = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]        self.prevision[0] = self.data["daily"][0]["dt"]
         self.prevision[1][6] = [self.data["daily"][0]["pressure"],
                                 round(self.data["daily"][0]["temp"]["day"], 0)]
-        pass
+        self.update()
 
-    @mproperty
-    def station_data(self):
-        return requests.get(
-            "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
-        ).json()
 
     def station_daily_rain(self):
         return self.station_data["observations"][0]["imperial"]["precipTotal"]
@@ -34,6 +26,9 @@ class Weather:
         return self.station_data["observations"][0]["imperial"]["temp"]
 
     def update(self):
+        self.station_data_source = requests.get(
+            "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
+        ).json()
         self.data = requests.get(
             f"https://api.openweathermap.org/data/2.5/onecall?lat={self.latitude}&lon={self.longitude}&lang=fr&appid={self.api_key}&units=imperial").json()
         return self.data
