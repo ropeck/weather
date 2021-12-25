@@ -13,7 +13,8 @@ class Weather:
         self.latitude = latitude
         self.longitude = longitude
         self.api_key = api_id
-        self.prevision = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]        self.prevision[0] = self.data["daily"][0]["dt"]
+        self.prevision = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]
+        self.prevision[0] = self.data["daily"][0]["dt"]
         self.prevision[1][6] = [self.data["daily"][0]["pressure"],
                                 round(self.data["daily"][0]["temp"]["day"], 0)]
         self.update()
