@@ -49,7 +49,8 @@ class Display:
     def draw_icon(self, x, y, c, l, h, icon):
         try:
             im_icon = Image.open("icons/" + icon + ".png")
-        except Exception:
+        except Exception as e:
+            print(str(e))
             return
         # im_icon = im_icon.convert("LA")
         im_icon = im_icon.resize((l, h))
