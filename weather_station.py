@@ -59,9 +59,10 @@ def main():
     display.draw_black.text((160, 110), weather.current_sunrise(), fill=0, font=font16)  # SUNRISE TIME
     display.draw_icon(220, 105, "b", 35, 35, "sunset")  # SUNSET ICON
     display.draw_black.text((260, 110), weather.current_sunset(), fill=0, font=font16)  # SUNSET TIME
-    
-    display.draw_black.text((10, 15), str(weather.station_temp()), fill=0, font=font96, color='black')
-    display.draw_black.text((10, 100), str(weather.station_daily_rain()), fill='blue', font=font96, color='blue')
+   
+    cur_h=345
+    display.draw_black.text((10, cur_h), str(weather.station_temp()), fill=0, font=font96, color='black')
+    display.draw_black.text((260, cur_h), str(weather.station_daily_rain()), fill='blue', font=font96, color='blue')
 
     ############################################################################
     # NEXT HOUR RAIN
@@ -166,7 +167,7 @@ def main():
     j = ["J-6", "J-5", "J-4", "J-3", "J-2", "J-1", "J"]  # LABELS
 
 
-    weather.graph_p_t()
+    #weather.graph_p_t()
     data = weather.prevision[1]
     global been_reboot #If reboot load the saved infos
     if (been_reboot == 1):
@@ -189,56 +190,58 @@ def main():
         pression.append(data[i][0])
         temperature.append(data[i][1])
 
-    # PRESSURE
-    display.draw_black.line((40, mini, 40, maxi + 20), fill=0, width=1)  # GRAPH AXIS
-    display.draw_black.text((10, mini), str(max(pression)), fill=0, font=font12)  # MAX AXIS GRAPH LABEL
-    display.draw_black.text((10, maxi), str(min(pression)), fill=0, font=font12)  # MIN AXIS GRAPH LABEL
-    display.draw_black.text((10, mini + (maxi - mini) // 2), str((max(pression) + min(pression)) // 2), fill=0,
-                            font=font12)  # MID VALUE LABEL
-    for i in range(len(x)):  # UPDATE CIRCLE POINTS
-        display.draw_black.text((x[i], 455), j[i], fill=0, font=font12)
-        display.draw_circle(x[i], map_resize(pression[i], min(pression), max(pression), maxi, mini), 3, "r")
-    for i in range(len(x) - 1):  # UPDATE LINE
-        display.draw_red.line((x[i], map_resize(pression[i], min(pression), max(pression), maxi, mini), x[i + 1],
-                               map_resize(pression[i + 1], min(pression), max(pression), maxi, mini)), fill=0,
-                              width=2)
-    # TEMPERATURE
-    display.draw_black.line((430, mini, 430, maxi + 20), fill=0, width=1)  # GRAPH AXIS
-    display.draw_black.text((410, mini), str(max(temperature)), fill=0, font=font12)  # MAX AXIS GRAPH LABEL
-    display.draw_black.text((410, maxi), str(min(temperature)), fill=0, font=font12)  # MIN AXIS GRAPH LABEL
-    display.draw_black.text((410, mini + (maxi - mini) // 2), str((max(temperature) + min(temperature)) // 2), fill=0,
-                            font=font12)  # MID VALUE LABEL
-    for i in range(len(x)):  # UPDATE CIRCLE POINTS
-        display.draw_black.text((x[i] + 400, 455), j[i], fill=0, font=font12)
-        display.draw_circle(x[i] + 400, map_resize(temperature[i], min(temperature), max(temperature), maxi, mini), 3,
-                            "r")
-    for i in range(len(x) - 1):  # UPDATE LINE
-        display.draw_red.line((x[i] + 400, map_resize(temperature[i], min(temperature), max(temperature), maxi, mini),
-                               x[i + 1] + 400,
-                               map_resize(temperature[i + 1], min(temperature), max(temperature), maxi, mini)),
-                              fill=0, width=2)
-    display.draw_black.text((10, 15), str(weather.station_temp()), fill=0, font=font96, color='black')
-    display.draw_black.text((10, 100), str(weather.station_daily_rain()), fill='blue', font=font96, color='blue')
-
+    graph_enabled = False
+    if graph_enabled:
+        # PRESSURE
+        display.draw_black.line((40, mini, 40, maxi + 20), fill=0, width=1)  # GRAPH AXIS
+        display.draw_black.text((10, mini), str(max(pression)), fill=0, font=font12)  # MAX AXIS GRAPH LABEL
+        display.draw_black.text((10, maxi), str(min(pression)), fill=0, font=font12)  # MIN AXIS GRAPH LABEL
+        display.draw_black.text((10, mini + (maxi - mini) // 2), str((max(pression) + min(pression)) // 2), fill=0,
+                                font=font12)  # MID VALUE LABEL
+        for i in range(len(x)):  # UPDATE CIRCLE POINTS
+            display.draw_black.text((x[i], 455), j[i], fill=0, font=font12)
+            display.draw_circle(x[i], map_resize(pression[i], min(pression), max(pression), maxi, mini), 3, "r")
+        for i in range(len(x) - 1):  # UPDATE LINE
+            display.draw_red.line((x[i], map_resize(pression[i], min(pression), max(pression), maxi, mini), x[i + 1],
+                                   map_resize(pression[i + 1], min(pression), max(pression), maxi, mini)), fill=0,
+                                  width=2)
+        # TEMPERATURE
+        display.draw_black.line((430, mini, 430, maxi + 20), fill=0, width=1)  # GRAPH AXIS
+        display.draw_black.text((410, mini), str(max(temperature)), fill=0, font=font12)  # MAX AXIS GRAPH LABEL
+        display.draw_black.text((410, maxi), str(min(temperature)), fill=0, font=font12)  # MIN AXIS GRAPH LABEL
+        display.draw_black.text((410, mini + (maxi - mini) // 2), str((max(temperature) + min(temperature)) // 2), fill=0,
+                                font=font12)  # MID VALUE LABEL
+        for i in range(len(x)):  # UPDATE CIRCLE POINTS
+            display.draw_black.text((x[i] + 400, 455), j[i], fill=0, font=font12)
+            display.draw_circle(x[i] + 400, map_resize(temperature[i], min(temperature), max(temperature), maxi, mini), 3,
+                                "r")
+        for i in range(len(x) - 1):  # UPDATE LINE
+            display.draw_red.line((x[i] + 400, map_resize(temperature[i], min(temperature), max(temperature), maxi, mini),
+                                   x[i + 1] + 400,
+                                   map_resize(temperature[i + 1], min(temperature), max(temperature), maxi, mini)),
+                                  fill=0, width=2)
+    
     ############################################################################
     # ALERT AND POLLUTION
 
     ############################################################################
     # NEWS UPDATE
     news_w = 385
-    news_selected = news.selected_title()
-    display.draw_black.text((news_w, 15), "NEWS", fill='green', font=font24)
-    for i in range(len(news_selected[:3])):
-        if len(news_selected) == 1:
-            display.draw_black.text((news_w, 40), news_selected[0], fill='green', font=font14)
-        elif len(news_selected[i]) <= 3 :
-            for j in range(len(news_selected[i])):
-                display.draw_black.text((news_w, 40 + j * 15 + i * 60), news_selected[i][j], fill='green', font=font14)
-        else:
-            for j in range(2):
-                display.draw_black.text((news_w, 40 + j * 15 + i * 60), news_selected[i][j], fill='green', font=font14)
-            display.draw_black.text((news_w, 40 + 2 * 15 + i * 60), news_selected[i][2] + "[...]", fill='green', font=font14)
-
+    news_enabled = False
+    if news_enabled:
+        news_selected = news.selected_title()
+        display.draw_black.text((news_w, 15), "NEWS", fill='green', font=font24)
+        for i in range(len(news_selected[:3])):
+            if len(news_selected) == 1:
+                display.draw_black.text((news_w, 40), news_selected[0], fill='green', font=font14)
+            elif len(news_selected[i]) <= 3 :
+                for j in range(len(news_selected[i])):
+                    display.draw_black.text((news_w, 40 + j * 15 + i * 60), news_selected[i][j], fill='green', font=font14)
+            else:
+                for j in range(2):
+                    display.draw_black.text((news_w, 40 + j * 15 + i * 60), news_selected[i][j], fill='green', font=font14)
+                display.draw_black.text((news_w, 40 + 2 * 15 + i * 60), news_selected[i][2] + "[...]", fill='green', font=font14)
+    
 
 
     ############################################################################

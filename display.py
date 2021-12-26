@@ -48,14 +48,11 @@ class Display:
 
     def draw_icon(self, x, y, c, l, h, icon):
         try:
+            print("draw_icon: {}.png".format(icon))
             im_icon = Image.open("icons/" + icon + ".png")
+        #im_icon = im_icon.convert("LA")
+            im_icon = im_icon.resize((l, h))
+            self.im_black.paste(im_icon, (x, y), im_icon)
         except Exception as e:
             print(str(e))
             return
-        # im_icon = im_icon.convert("LA")
-        im_icon = im_icon.resize((l, h))
-        c="b"
-        if c == "b":
-            self.im_black.paste(im_icon, (x, y), im_icon)
-        else:
-            self.im_red.paste(im_icon, (x, y), im_icon)

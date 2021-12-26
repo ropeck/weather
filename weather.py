@@ -120,8 +120,8 @@ class Weather:
             daily[key]["max"] = "{:.0f}".format(self.data["daily"][i]["temp"]["max"]) + "F"
             daily[key]["pop"] = "{:.0f}".format(self.data["daily"][i]["pop"] * 100) + "%"
             daily[key]["id"] = self.data["daily"][i]["weather"][0]["id"]
-            daily[key]["main"] = self.data["daily"][i]["main"]
-            daily[key]["icon"] = self.data["daily"][i]["icon"]
+            #daily[key]["main"] = self.data["daily"][i]["main"]
+            #daily[key]["icon"] = self.data["daily"][i]["icon"]
             i += 1
 
         return daily
@@ -158,13 +158,13 @@ class Weather:
         else:
             if id == 801:
                 icon = "25_clouds"
-                weather_detail = "Peu nuageux"
+                weather_detail = "Partly Cloudy"
             elif id == 802:
                 icon = "50_clouds"
-                weather_detail = "Nuageux"
+                weather_detail = "Cloudy"
             elif id == 803 or id == 804:
                 icon = "100_clouds"
-                weather_detail = "Couvert"
+                weather_detail = "Overcast"
 
         return icon, weather_detail
 
