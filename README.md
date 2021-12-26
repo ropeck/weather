@@ -113,3 +113,9 @@ api.openweathermap.org/data/2.5/forecast?lat=36.973396&lon=-121.908257&appid=b69
 
 ```
 <img src="images/todo-1.jpg">
+
+
+## icons
+Found a source of images for icons
+https://github.com/visualcrossing/WeatherIcons
+
