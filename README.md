@@ -3,6 +3,7 @@
 <a href="images/weatherstation.jpg">
 <img src="images/weatherstation_th.jpg">
 </a>
+<img src="images/20211225 weather.png">
 
 
 * weather station api details
