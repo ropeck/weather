@@ -120,6 +120,8 @@ class Weather:
             daily[key]["max"] = "{:.0f}".format(self.data["daily"][i]["temp"]["max"]) + "F"
             daily[key]["pop"] = "{:.0f}".format(self.data["daily"][i]["pop"] * 100) + "%"
             daily[key]["id"] = self.data["daily"][i]["weather"][0]["id"]
+            daily[key]["main"] = self.data["daily"][i]["main"]
+            daily[key]["icon"] = self.data["daily"][i]["icon"]
             i += 1
 
         return daily
