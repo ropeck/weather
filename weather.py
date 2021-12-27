@@ -39,7 +39,7 @@ class Weather:
         return self.data
 
     def update_database(self):
-        db = sqlite3.connect(DBPATHNAME)
+        db = sqlite3.connect(self.DBPATHNAME)
         cur = db.cursor()
         #  create table weather (st INTEGER, temp FLOAT, rain FLOAT);
         print(cur.execute("INSERT IN weather VALUES(1,55.0,0.02);"))
