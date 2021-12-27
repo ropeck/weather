@@ -115,6 +115,86 @@ api.openweathermap.org/data/2.5/forecast?lat=36.973396&lon=-121.908257&appid=b69
 ```
 <img src="images/todo-1.jpg">
 
+## weather underground
+current data and historical data are available with the api
+collect this data and save it to a local sqlite database for reports and graphs
+
+5 minute stats
+```
+wget -O - 'https://api.weather.com/v2/pws/observations/hourly/1day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb' | jq
+```
+
+hourly stats
+```
+wget -O - 'https://api.weather.com/v2/pws/observations/hourly/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb' | jq
+
+{
+  "observations": [
+    {
+      "stationID": "KCAAPTOS92",
+      "tz": "America/Los_Angeles",
+      "obsTimeUtc": "2021-12-20T08:59:56Z",
+      "obsTimeLocal": "2021-12-20 00:59:56",
+      "epoch": 1639990796,
+      "lat": 36.973396,
+      "lon": -121.908257,
+      "solarRadiationHigh": 0,
+      "uvHigh": 0,
+      "winddirAvg": 135,
+      "humidityHigh": 92,
+      "humidityLow": 83,
+      "humidityAvg": 87,
+      "qcStatus": 1,
+      "imperial": {
+        "tempHigh": 51,
+        "tempLow": 47,
+        "tempAvg": 50,
+        "windspeedHigh": 9,
+        "windspeedLow": 0,
+        "windspeedAvg": 3,
+        "windgustHigh": 10,
+        "windgustLow": 0,
+        "windgustAvg": 4,
+        "dewptHigh": 47,
+        "dewptLow": 44,
+        "dewptAvg": 46,
+        "windchillHigh": 51,
+        "windchillLow": 45,
+        "windchillAvg": 50,
+        "heatindexHigh": 51,
+        "heatindexLow": 47,
+        "heatindexAvg": 50,
+        "pressureMax": 29.78,
+        "pressureMin": 29.77,
+        "pressureTrend": 0,
+        "precipRate": 0,
+        "precipTotal": 0
+      }
+    },
+...
+  ]
+}
+
+```
+
+      "epoch": 1639990796,
+      "solarRadiationHigh": 0,
+      "uvHigh": 0,
+      "winddirAvg": 135,
+      "humidityAvg": 87,
+      "imperial": {
+        "tempAvg": 50,
+        "windspeedAvg": 3,
+        "windgustHigh": 10,
+        "precipRate": 0,
+        "precipTotal": 0
+      }
+    },
+...
+
+
+general plan ... after fetching the stats, save the weather station measurements to a table
+save the last 24 hours of 5 minute readings and all the hourly data
 
 ## icons
 Found a source of images for icons
