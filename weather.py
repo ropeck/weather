@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-
+import sqlite3
 import time
 
 from memoize import mproperty
@@ -9,6 +9,7 @@ import locale
 locale.setlocale(locale.LC_TIME, '')
 
 class Weather:
+    DBPATHNAME="/home/pi/weather.sqlite3"
     def __init__(self, latitude, longitude, api_id):
         self.latitude = latitude
         self.longitude = longitude
@@ -34,7 +35,17 @@ class Weather:
         forecast_api = f"https://api.openweathermap.org/data/2.5/onecall?lat={obs['lat']}&lon={obs['lon']}&appid={self.api_key}&units=imperial"
         print (forecast_api)
         self.data = requests.get(forecast_api).json()
+        self.update_database()
         return self.data
+
+    def update_database(self):
+        db = sqlite3.connect(DBPATHNAME)
+        cur = db.cursor()
+        #  create table weather (st INTEGER, temp FLOAT, rain FLOAT);
+        print(cur.execute("INSERT IN weather VALUES(1,55.0,0.02);"))
+        cur.close()
+        db.close()
+
 
     def current_time(self):
         return time.strftime("%d/%m/%Y %H:%M", time.localtime(self.data["current"]["dt"]))
