@@ -22,10 +22,10 @@ class Weather:
 
 
     def station_daily_rain(self):
-        return self.station_data["observations"][0]["imperial"]["precipTotal"]
+        return round(self.station_data["observations"][0]["imperial"]["precipTotal"],2)
 
     def station_temp(self):
-        return self.station_data["observations"][0]["imperial"]["temp"]
+        return round(self.station_data["observations"][0]["imperial"]["temp"],2)
 
     def update(self):
         self.station_data = requests.get(
