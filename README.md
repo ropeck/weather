@@ -5,7 +5,7 @@
 </a>
 <img src="images/20211225 weather.png">
 
-<a href="https://photos.google.com/u/1/album/AF1QipMrKkpr44q9oncBbR-g1Uv2OszuV5eHCWaLdMhs">photo album</a>
+<a href="https://photos.app.goo.gl/Dp2A8mD3yMGmoW7K7">photo album</a>
 
 * weather station api details
 
