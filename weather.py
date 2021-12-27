@@ -43,9 +43,10 @@ class Weather:
         cur = db.cursor()
         #  create table weather (st INTEGER, temp FLOAT, rain FLOAT);
         print(cur.execute("INSERT INTO weather VALUES({},{},{});".format(
-            self.station_data["epoch"], self.station_temp(), self.station_daily_rain())
-        )))
+            self.station_data["observations"][0]["epoch"],
+            self.station_temp(), self.station_daily_rain())))
         cur.close()
+        db.commit()
         db.close()
 
 
