@@ -9,7 +9,7 @@ import locale
 locale.setlocale(locale.LC_TIME, '')
 
 class Weather:
-    DBPATHNAME="/home/pi/weather.sqlite3"
+    DBPATHNAME="/home/pi/weather/weather.sqlite3"
     def __init__(self, latitude, longitude, api_id):
         self.latitude = latitude
         self.longitude = longitude
