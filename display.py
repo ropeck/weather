@@ -20,6 +20,10 @@ elif font_choice == 7:
 else:
     project_font = "font/Open_Sans/OpenSans-SemiBold.ttf"
 
+try:
+    font8 = ImageFont.truetype(project_font, 8)
+except OSError:
+    project_font = "arial.ttf"
 print(project_font)
 
 font8 = ImageFont.truetype(project_font, 8)
