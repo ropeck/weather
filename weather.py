@@ -42,9 +42,13 @@ class Weather:
         db = sqlite3.connect(self.DBPATHNAME)
         cur = db.cursor()
         #  create table weather (st INTEGER, temp FLOAT, rain FLOAT);
-        print(cur.execute("INSERT INTO weather VALUES(?,?,?);",
-            [self.station_data["observations"][0]["epoch"],
-             self.station_temp(), self.station_daily_rain()]))
+        sd = self.station_data["observations"][0]
+        d = [sd[k] for k in ["epoch", "solarRadiation", "uv", "winddir", "humidity"]]
+        di = [sd["imperial"][k] for k in ["temp", "windSpeed", "windGust", "pressure", "precipRate", "precipTotal"]]
+        col = d + d1
+        query = "INSERT INTO weather ({}) VALUES (?{});".format(",".join(columns), ",?" * len(columns-1))
+        print(query)
+        print(cur.execute(query, d)
         cur.close()
         db.commit()
         db.close()
