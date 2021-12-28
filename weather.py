@@ -51,13 +51,14 @@ class Weather:
                "temp", "windSpeed", "windGust", "pressure", "precipRate",
                "precipTotal"]
         query = "INSERT INTO weather ({}) VALUES (?{});".format(",".join(col_names), ",?" * (len(columns)-1))
+        cur.execute(query, columns)
         cur.close()
         db.commit()
         db.close()
 
 #  CREATE TABLE weather (epoch INTEGER, solarRadiation FLOAT, uv FLOAT,
 #          winddir FLOAT, humidity FLOAT, temp FLOAT, windSpeed FLOAT,
-#          windGust FLOAT, pressure FLOAT, precipRate FLOAT, precipTotal);
+#          windGust FLOAT, pressure FLOAT, precipRate FLOAT, precipTotal FLOAT);
 #  
     def current_time(self):
         return time.strftime("%d/%m/%Y %H:%M", time.localtime(self.data["current"]["dt"]))
