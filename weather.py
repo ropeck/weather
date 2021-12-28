@@ -45,15 +45,20 @@ class Weather:
         sd = self.station_data["observations"][0]
         d = [sd[k] for k in ["epoch", "solarRadiation", "uv", "winddir", "humidity"]]
         di = [sd["imperial"][k] for k in ["temp", "windSpeed", "windGust", "pressure", "precipRate", "precipTotal"]]
-        col = d + d1
-        query = "INSERT INTO weather ({}) VALUES (?{});".format(",".join(columns), ",?" * len(columns-1))
-        print(query)
-        print(cur.execute(query, d)
+        columns = [str(x) for x in d + di]
+        col_names = [
+               "epoch", "solarRadiation", "uv", "winddir", "humidity",
+               "temp", "windSpeed", "windGust", "pressure", "precipRate",
+               "precipTotal"]
+        query = "INSERT INTO weather ({}) VALUES (?{});".format(",".join(col_names), ",?" * (len(columns)-1))
         cur.close()
         db.commit()
         db.close()
 
-
+#  CREATE TABLE weather (epoch INTEGER, solarRadiation FLOAT, uv FLOAT,
+#          winddir FLOAT, humidity FLOAT, temp FLOAT, windSpeed FLOAT,
+#          windGust FLOAT, pressure FLOAT, precipRate FLOAT, precipTotal);
+#  
     def current_time(self):
         return time.strftime("%d/%m/%Y %H:%M", time.localtime(self.data["current"]["dt"]))
 
