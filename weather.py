@@ -50,7 +50,7 @@ class Weather:
                "epoch", "solarRadiation", "uv", "winddir", "humidity",
                "temp", "windSpeed", "windGust", "pressure", "precipRate",
                "precipTotal"]
-        query = "INSERT INTO weather ({}) VALUES ({});".format(",".join(col_names), "?" + ,?" * (len(columns)-1))
+        query = "INSERT INTO weather ({}) VALUES ({});".format(",".join(col_names), "?" + ",?" * (len(columns)-1))
         cur.execute(query, columns)
         cur.close()
         db.commit()
