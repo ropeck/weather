@@ -45,7 +45,7 @@ class TestWeather(TestCase):
         w.update()
         ex = self.mock_sql.connect().cursor().execute
 
-        self.assertEqual(1, sum('INSERT' in args[0] for (args, _) in ex.call_args_list),
+        self.assertEqual(1, sum('INSERT INTO weather' in args[0] for (args, _) in ex.call_args_list),
                          "Should be only one new db record")
         insert_found = False
         for call in ex.call_args_list:
