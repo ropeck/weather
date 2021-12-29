@@ -49,7 +49,8 @@ class Weather:
         cur = db.cursor()
         #  create table weather (st INTEGER, temp FLOAT, rain FLOAT);
         sd = self.station_data["observations"][0]
-        cur.execute("SELECT epoch FROM weather WHERE epoch = ?", sd["epoch"])
+        cur.execute("SELECT epoch FROM weather WHERE epoch = ?",
+               [(sd["epoch"]),])
         if cur.fetchall():
             return
         d = [sd[k] for k in ["epoch", "solarRadiation", "uv", "winddir", "humidity"]]

@@ -13,6 +13,7 @@ from weather import *
 from news import *
 from display import *
 import json
+import traceback
 
 lat = "36.9"
 lon = "-121.9"
@@ -289,6 +290,7 @@ if __name__ == "__main__":
             current_time = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
             print("INITIALIZATION PROBLEM- @" + current_time)
             print(str(e))
+            print(traceback.format_exc())
             time.sleep(2)
 
     while True:
