@@ -54,20 +54,16 @@ class TestWeather(TestCase):
                 continue
             insert_found = True
             self.assertEqual(args[0],
-                             ('INSERT INTO weather (epoch,solarRadiation,uv,winddir,humidity,temp,windSpeed,'
-                              'windGust,pressure,precipRate,precipTotal) VALUES (?,?,?,?,?,?,?,?,?,?,?);'))
-            self.assertEqual(args[1], ['1640740178',
-                                       '0.0',
-                                       '0.0',
-                                       '347',
-                                       '89.0',
-                                       '47.8',
-                                       '4.9',
-                                       '4.9',
-                                       '29.5',
-                                       '0.0',
-                                       '0.01'])
+                             ('INSERT INTO weather (epoch,obsTimeLocal,dewpt,heatIndex,humidity,precipRate,'
+                              'precipTotal,pressure,solarRadiation,temp,uv,windChill,windGust,windSpeed,winddir) '
+                              'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);'))
+            self.assertEqual(args[1], ['1640740178', '2021-12-28 17:09:38', '44.8', '47.8', '89.0', '0.0', '0.01',
+                                       '29.5', '0.0', '47.8', '0.0', '45.7', '4.9', '4.9', '347'])
         self.assertTrue(insert_found)
+        self.assertEqual(w.db_create_statement("weather", w.station_data_api_call()),
+                         ("CREATE TABLE weather (epoch INTEGER, obsTimeLocal STRING , dewpt FLOAT, heatIndex FLOAT, "
+                          "humidity FLOAT, precipRate FLOAT, precipTotal FLOAT, pressure FLOAT, solarRadiation FLOAT, "
+                          "temp FLOAT, uv FLOAT, windChill FLOAT, windGust FLOAT, windSpeed FLOAT, winddir FLOAT);"))
 
         if __name__ == '__main__':
             unittest.main()

@@ -58,26 +58,50 @@ class Weather:
             "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
         ).json()
 
+
     def update_database(self):
-        db = sqlite3.connect(self.DBPATHNAME)
-        cur = db.cursor()
-        #  create table weather (st INTEGER, temp FLOAT, rain FLOAT);
         sd = self.station_data["observations"][0]
-        cur.execute("SELECT epoch FROM weather WHERE epoch = ?",
-               [(sd["epoch"]),])
-        if cur.fetchall():
-            return
+        data = self.flatten_wunderground_data(sd)
+        col_names = [
+               "epoch", "solarRadiation", "uv", "winddir", "humidity",
+               "temp", "windSpeed", "windGust", "pressure", "precipRate",
+               "precipTotal"]
+        self.insert_if_new("weather", self.db_col_names(data), data)
+
+    def flatten_wunderground_data(self, sd):
         data = {}
         for k, v in list(sd.items()) + list(sd["imperial"].items()):
             if k in data.keys():
                 raise Exception('duplicate key: {}', k)
             data[k] = v
-        col_names = [
-               "epoch", "solarRadiation", "uv", "winddir", "humidity",
-               "temp", "windSpeed", "windGust", "pressure", "precipRate",
-               "precipTotal"]
+        return data
+
+    def db_col_names(self, data):
+        self.col_blocklist = ("epoch, country, elev, imperial, lat, lon, neighborhood, obsTimeLocal, "
+                              "obsTimeUtc, qcStatus, realtimeFrequency, softwareType, stationID").split(", ")
+
+        names = [n for n in data.keys() if n not in self.col_blocklist]
+        names.sort()
+        return ["epoch", "obsTimeLocal"] + names
+
+    def db_create_statement(self, table, data):
+        # first two columns are integer and string, the rest are float
+        cols = self.db_col_names(self.flatten_wunderground_data(data["observations"][0]))[2:]
+        col_types = ''.join([f", {n} FLOAT" for n in cols])
+        cmd = "CREATE TABLE {} (epoch INTEGER, obsTimeLocal STRING {});".format(
+            table, col_types)
+        return cmd
+
+    def insert_if_new(self, table, col_names, data):
         columns = [str(data[k]) for k in col_names]
-        query = "INSERT INTO weather ({}) VALUES ({});".format(",".join(col_names), "?" + ",?" * (len(columns)-1))
+        query = "INSERT INTO {} ({}) VALUES ({});".format(
+            table, ",".join(col_names), "?" + ",?" * (len(columns) - 1))
+        db = sqlite3.connect(self.DBPATHNAME)
+        cur = db.cursor()
+        cur.execute("SELECT epoch FROM weather WHERE epoch = ?",
+               [(data["epoch"]),])
+        if cur.fetchall():
+            return
         cur.execute(query, columns)
         cur.close()
         db.commit()
