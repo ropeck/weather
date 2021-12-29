@@ -40,7 +40,6 @@ class TestWeather(TestCase):
         api_key_weather = "apikey"
         w = weather.Weather(lat, lon, api_key_weather)
 
-        f = self.mock_sql.connect().cursor().fetchall
         self.mock_sql.connect().cursor().fetchall.return_value = [(1640740178,)]
 
         w.update()
