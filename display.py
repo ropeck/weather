@@ -59,4 +59,4 @@ class Display:
             self.im_black.paste(im_icon, (x, y), im_icon)
         except Exception as e:
             print(str(e))
-            return
+            self.im_black.text((x, y), "not found: {}".format(icon), fill="red", font=font48)
