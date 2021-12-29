@@ -39,6 +39,9 @@ class Weather:
         for sd in self.station_hourly_historic_data()["observations"]:
             self.update_database("hourly", sd)
 
+        for sd in self.station_rapid_historic_data()["observations"]:
+            self.update_database("rapid", sd)
+
         obs = self.station_data["observations"][0]
         self.lat = obs["lat"]
         self.longitude = obs["lon"]
@@ -60,6 +63,16 @@ class Weather:
         # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
         return requests.get(
             (f"https://api.weather.com/v2/pws/observations/hourly/7day?"
+             f"stationId={station_id}&format=json&units=e&apiKey={api_key}")
+        ).json()
+
+
+    def station_rapid_historic_data(self):
+        station_id = "KCAAPTOS92"
+        api_key = "5bb5ecb88c674ef9b5ecb88c67def9fb"
+        # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
+        return requests.get(
+            (f"https://api.weather.com/v2/pws/observations/all/1day?"
              f"stationId={station_id}&format=json&units=e&apiKey={api_key}")
         ).json()
 
