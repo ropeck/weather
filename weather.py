@@ -1,16 +1,16 @@
 # -*- coding:utf-8 -*-
-import json
+import locale
 import sqlite3
 import time
 
-from memoize import mproperty
 import requests
-import locale
 
 locale.setlocale(locale.LC_TIME, '')
 
+
 class Weather:
-    DBPATHNAME="/home/pi/weather/weather.sqlite3"
+    DBPATHNAME = "/home/pi/weather/weather.sqlite3"
+
     def __init__(self, latitude, longitude, api_id):
         self.known_tables = []
         self.latitude = latitude
@@ -22,14 +22,13 @@ class Weather:
         self.prevision[1][6] = [self.data["daily"][0]["pressure"],
                                 round(self.data["daily"][0]["temp"]["day"], 0)]
 
-
     def station_daily_rain(self):
-        return round(self.station_data["observations"][0]["imperial"]["precipTotal"],2)
+        return round(self.station_data["observations"][0]["imperial"]["precipTotal"], 2)
 
     def station_temp(self):
-        return round(self.station_data["observations"][0]["imperial"]["temp"],2)
+        return round(self.station_data["observations"][0]["imperial"]["temp"], 2)
 
-    def update(self):
+    def update(self) -> object:
         self.station_data = self.station_data_api_call()
         obs = self.station_data["observations"][0]
         self.data = self.forecast_api_call(obs["lat"], obs["lon"], self.api_key)
@@ -37,14 +36,15 @@ class Weather:
         return self.data
 
     def station_daily_historic_data(self):
-        station_id="KCAAPTOS92"
-        api_key="5bb5ecb88c674ef9b5ecb88c67def9fb"
+        station_id = "KCAAPTOS92"
+        api_key = "5bb5ecb88c674ef9b5ecb88c67def9fb"
         # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
         return requests.get(
-            f"https://api.weather.com/v2/pws/dailysummary/7day?stationId={station_id}&format=json&units=e&apiKey={api_key}"
+            (f"https://api.weather.com/v2/pws/dailysummary/7day?"
+             f"stationId={station_id}&format=json&units=e&apiKey={api_key}")
         ).json()
 
-# hourly historic
+    # hourly historic
     # https://docs.google.com/document/d/1wzejRIUONpdGv0P3WypGEqvSmtD5RAsNOOucvdNRi6k/edit
     # https://api.weather.com/v2/pws/observations/all/1day?stationId=KMAHANOV10&format=json&units=e&apiKey=yourApiKey
     # https://api.weather.com/v2/pws/observations/hourly/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal
@@ -59,21 +59,20 @@ class Weather:
             "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
         ).json()
 
-
     def update_database(self):
         sd = self.station_data["observations"][0]
         data = self.flatten_wunderground_data(sd)
         col_names = [
-               "epoch", "solarRadiation", "uv", "winddir", "humidity",
-               "temp", "windSpeed", "windGust", "pressure", "precipRate",
-               "precipTotal"]
+            "epoch", "solarRadiation", "uv", "winddir", "humidity",
+            "temp", "windSpeed", "windGust", "pressure", "precipRate",
+            "precipTotal"]
         self.insert_if_new("weather", self.db_col_names(data), data)
 
     def flatten_wunderground_data(self, sd):
         data = {}
         for k, v in list(sd.items()) + list(sd["imperial"].items()):
             if k in data.keys():
-               raise Exception('duplicate key: {}', k)
+                raise Exception('duplicate key: {}', k)
             data[k] = v
         return data
 
@@ -103,11 +102,11 @@ class Weather:
             cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
             ret = cur.fetchall()
             if ret:
-              self.known_tables = list(ret[0])
+                self.known_tables = list(ret[0])
         if "weather" not in self.known_tables:
             cur.execute(self.db_create_statement("weather", data))
         cur.execute("SELECT epoch FROM weather WHERE epoch = ?",
-               [(data["epoch"]),])
+                    [(data["epoch"]), ])
         if cur.fetchall():
             return
         cur.execute(query, columns)
@@ -115,10 +114,10 @@ class Weather:
         db.commit()
         db.close()
 
-#  CREATE TABLE weather (epoch INTEGER, solarRadiation FLOAT, uv FLOAT,
-#          winddir FLOAT, humidity FLOAT, temp FLOAT, windSpeed FLOAT,
-#          windGust FLOAT, pressure FLOAT, precipRate FLOAT, precipTotal FLOAT);
-#  
+    #  CREATE TABLE weather (epoch INTEGER, solarRadiation FLOAT, uv FLOAT,
+    #          winddir FLOAT, humidity FLOAT, temp FLOAT, windSpeed FLOAT,
+    #          windGust FLOAT, pressure FLOAT, precipRate FLOAT, precipTotal FLOAT);
+    #
     def current_time(self):
         return time.strftime("%d/%m/%Y %H:%M", time.localtime(self.data["current"]["dt"]))
 
@@ -203,8 +202,8 @@ class Weather:
             daily[key]["max"] = "{:.0f}".format(self.data["daily"][i]["temp"]["max"]) + "F"
             daily[key]["pop"] = "{:.0f}".format(self.data["daily"][i]["pop"] * 100) + "%"
             daily[key]["id"] = self.data["daily"][i]["weather"][0]["id"]
-            #daily[key]["main"] = self.data["daily"][i]["main"]
-            #daily[key]["icon"] = self.data["daily"][i]["icon"]
+            # daily[key]["main"] = self.data["daily"][i]["main"]
+            # daily[key]["icon"] = self.data["daily"][i]["icon"]
             i += 1
 
         return daily
