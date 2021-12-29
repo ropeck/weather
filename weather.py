@@ -53,13 +53,16 @@ class Weather:
                [(sd["epoch"]),])
         if cur.fetchall():
             return
-        d = [sd[k] for k in ["epoch", "solarRadiation", "uv", "winddir", "humidity"]]
-        di = [sd["imperial"][k] for k in ["temp", "windSpeed", "windGust", "pressure", "precipRate", "precipTotal"]]
-        columns = [str(x) for x in d + di]
+        data = {}
+        for k, v in list(sd.items()) + list(sd["imperial"].items()):
+            if k in data.keys():
+                raise Exception('duplicate key: {}', k)
+            data[k] = v
         col_names = [
                "epoch", "solarRadiation", "uv", "winddir", "humidity",
                "temp", "windSpeed", "windGust", "pressure", "precipRate",
                "precipTotal"]
+        columns = [str(data[k]) for k in col_names]
         query = "INSERT INTO weather ({}) VALUES ({});".format(",".join(col_names), "?" + ",?" * (len(columns)-1))
         cur.execute(query, columns)
         cur.close()
