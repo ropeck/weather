@@ -1,6 +1,4 @@
-import sqlite3
-
-from mock import patch, MagicMock
+from mock import patch
 from unittest import TestCase
 import weather
 
