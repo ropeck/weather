@@ -121,10 +121,10 @@ class Weather:
             ret = cur.fetchall()
             if ret:
                 self.known_tables = list(ret[0])
-        if "weather" not in self.known_tables:
-            cur.execute(self.db_create_statement("weather", data))
-        cur.execute("SELECT epoch FROM weather WHERE epoch = ?",
-                    [(data["epoch"]), ])
+        if table not in self.known_tables:
+            cur.execute(self.db_create_statement(table, data))
+        cur.execute("SELECT epoch FROM ? WHERE epoch = ?",
+                    [(table, data["epoch"]), ])
         if cur.fetchall():
             return
         cur.execute(query, columns)
