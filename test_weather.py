@@ -1,5 +1,6 @@
 import json
 from unittest import TestCase
+import unittest
 
 from mock import patch
 
@@ -66,5 +67,5 @@ class TestWeather(TestCase):
                          w.db_create_statement("weather", w.flatten_wunderground_data(
                              w.station_data_api_call()["observations"][0])))
 
-        if __name__ == '__main__':
-            unittest.main()
+if __name__ == '__main__':
+    unittest.main()
