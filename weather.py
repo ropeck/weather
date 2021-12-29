@@ -120,7 +120,7 @@ class Weather:
             cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
             ret = cur.fetchall()
             if ret:
-                self.known_tables = list(ret[0])
+                self.known_tables = [a[0] for a in ret]
         if table not in self.known_tables:
             cur.execute(self.db_create_statement(table, data))
             self.known_tables.append(table)
