@@ -50,7 +50,7 @@ class TestWeather(TestCase):
         insert_found = False
         for call in ex.call_args_list:
             args, kwargs = call
-            if 'INSERT' not in args[0]:
+            if 'INSERT INTO weather' not in args[0]:
                 continue
             insert_found = True
             self.assertEqual(args[0],

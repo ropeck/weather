@@ -30,9 +30,19 @@ class Weather:
 
     def update(self) -> object:
         self.station_data = self.station_data_api_call()
+        for sd in self.station_data["observations"]:
+            self.update_database("weather", sd)
+
+        for sd in self.station_daily_historic_data()["summaries"]:
+            self.update_database("daily", sd)
+
+        for sd in self.station_hourly_historic_data()["observations"]:
+            self.update_database("hourly", sd)
+
         obs = self.station_data["observations"][0]
-        self.data = self.forecast_api_call(obs["lat"], obs["lon"], self.api_key)
-        self.update_database()
+        self.lat = obs["lat"]
+        self.longitude = obs["lon"]
+        self.data = self.forecast_api_call(self.lat, self.longitude, self.api_key)
         return self.data
 
     def station_daily_historic_data(self):
@@ -41,6 +51,15 @@ class Weather:
         # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
         return requests.get(
             (f"https://api.weather.com/v2/pws/dailysummary/7day?"
+             f"stationId={station_id}&format=json&units=e&apiKey={api_key}")
+        ).json()
+
+    def station_hourly_historic_data(self):
+        station_id = "KCAAPTOS92"
+        api_key = "5bb5ecb88c674ef9b5ecb88c67def9fb"
+        # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
+        return requests.get(
+            (f"https://api.weather.com/v2/pws/observations/hourly/7day?"
              f"stationId={station_id}&format=json&units=e&apiKey={api_key}")
         ).json()
 
@@ -59,14 +78,13 @@ class Weather:
             "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
         ).json()
 
-    def update_database(self):
-        sd = self.station_data["observations"][0]
+    def update_database(self, table, sd):
         data = self.flatten_wunderground_data(sd)
         col_names = [
             "epoch", "solarRadiation", "uv", "winddir", "humidity",
             "temp", "windSpeed", "windGust", "pressure", "precipRate",
             "precipTotal"]
-        self.insert_if_new("weather", self.db_col_names(data), data)
+        self.insert_if_new(table, self.db_col_names(data), data)
 
     def flatten_wunderground_data(self, sd):
         data = {}
