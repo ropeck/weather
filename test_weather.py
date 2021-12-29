@@ -13,10 +13,6 @@ class TestWeather(TestCase):
         self.mock_sql = p.start()
         self.addCleanup(p.stop)
 
-        # p = patch('requests.get')
-        # self.mock_get = p.start()
-        # self.addCleanup(p.stop)
-
         p = patch('weather.Weather.station_data_api_call', return_value={
             'observations': [
                 {'stationID': 'KCAAPTOS92', 'obsTimeUtc': '2021-12-29T01:09:38Z', 'obsTimeLocal': '2021-12-28 17:09:38',
@@ -44,13 +40,13 @@ class TestWeather(TestCase):
         lat = "36.9"
         lon = "-121.9"
         api_key_weather = "apikey"
-        # self.mock_get.json.return_value = None
         w = weather.Weather(lat, lon, api_key_weather)
         w.update()
         ex = self.mock_sql.connect().cursor().execute
-        args, kwargs = ex.call_args
 
-        self.assertTrue(ex.called)
+        self.assertEqual(1, sum('INSERT' in args[0] for (args, _) in ex.call_args_list),
+                         "Should be only one new db record")
+        args, kwargs = ex.call_args
         self.assertEqual(args[0],
                          ('INSERT INTO weather (epoch,solarRadiation,uv,winddir,humidity,temp,windSpeed,'
                           'windGust,pressure,precipRate,precipTotal) VALUES (?,?,?,?,?,?,?,?,?,?,?);'))
