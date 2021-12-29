@@ -12,6 +12,7 @@ class TestWeather(TestCase):
         p = patch('weather.sqlite3')
         self.mock_sql = p.start()
         self.addCleanup(p.stop)
+        self.mock_sql.connect().cursor().fetchall.return_value = []
 
         p = patch('weather.Weather.station_data_api_call', return_value={
             'observations': [
@@ -30,9 +31,6 @@ class TestWeather(TestCase):
             p.start()
             self.addCleanup(p.stop)
 
-    # TODO: mock station data API call
-    # TODO: mock forecast data API call
-    # TODO: only update database if new data
     # TODO: collect station data for 5minute and hourly updates and save to databases
     # TODO: add testing for all that too
 
@@ -41,26 +39,36 @@ class TestWeather(TestCase):
         lon = "-121.9"
         api_key_weather = "apikey"
         w = weather.Weather(lat, lon, api_key_weather)
+
+        f = self.mock_sql.connect().cursor().fetchall
+        self.mock_sql.connect().cursor().fetchall.return_value = [(1640740178,)]
+
         w.update()
         ex = self.mock_sql.connect().cursor().execute
 
         self.assertEqual(1, sum('INSERT' in args[0] for (args, _) in ex.call_args_list),
                          "Should be only one new db record")
-        args, kwargs = ex.call_args
-        self.assertEqual(args[0],
-                         ('INSERT INTO weather (epoch,solarRadiation,uv,winddir,humidity,temp,windSpeed,'
-                          'windGust,pressure,precipRate,precipTotal) VALUES (?,?,?,?,?,?,?,?,?,?,?);'))
-        self.assertEqual(args[1], ['1640740178',
-                                   '0.0',
-                                   '0.0',
-                                   '347',
-                                   '89.0',
-                                   '47.8',
-                                   '4.9',
-                                   '4.9',
-                                   '29.5',
-                                   '0.0',
-                                   '0.01'])
+        insert_found = False
+        for call in ex.call_args_list:
+            args, kwargs = call
+            if 'INSERT' not in args[0]:
+                continue
+            insert_found = True
+            self.assertEqual(args[0],
+                             ('INSERT INTO weather (epoch,solarRadiation,uv,winddir,humidity,temp,windSpeed,'
+                              'windGust,pressure,precipRate,precipTotal) VALUES (?,?,?,?,?,?,?,?,?,?,?);'))
+            self.assertEqual(args[1], ['1640740178',
+                                       '0.0',
+                                       '0.0',
+                                       '347',
+                                       '89.0',
+                                       '47.8',
+                                       '4.9',
+                                       '4.9',
+                                       '29.5',
+                                       '0.0',
+                                       '0.01'])
+        self.assertTrue(insert_found)
 
         if __name__ == '__main__':
             unittest.main()
