@@ -101,7 +101,9 @@ class Weather:
         cur = db.cursor()
         if self.known_tables == []:
             cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
-            self.known_tables = cur.fetchall()
+            ret = cur.fetchall()
+            if ret:
+              self.known_tables = list(ret[0])
         if "weather" not in self.known_tables:
             cur.execute(self.db_create_statement("weather", data))
         cur.execute("SELECT epoch FROM weather WHERE epoch = ?",
