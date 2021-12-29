@@ -141,6 +141,7 @@ class Weather:
                     [(data["epoch"]), ])
         if cur.fetchall():
             return
+        print(query, str(columns))
         cur.execute(query, columns)
         cur.close()
         db.commit()
