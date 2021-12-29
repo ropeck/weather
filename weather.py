@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import json
 import sqlite3
 import time
 
@@ -28,15 +29,20 @@ class Weather:
         return round(self.station_data["observations"][0]["imperial"]["temp"],2)
 
     def update(self):
-        self.station_data = requests.get(
-            "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
-        ).json()
+        self.station_data = self.station_data_api_call()
         obs = self.station_data["observations"][0]
-        forecast_api = f"https://api.openweathermap.org/data/2.5/onecall?lat={obs['lat']}&lon={obs['lon']}&appid={self.api_key}&units=imperial"
-        print (forecast_api)
-        self.data = requests.get(forecast_api).json()
+        self.data = self.forecast_api_call(obs["lat"], obs["lon"], self.api_key)
         self.update_database()
         return self.data
+
+    def forecast_api_call(self, lat, lon, api_key):
+        forecast_api = f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid={api_key}&units=imperial"
+        return requests.get(forecast_api).json()
+
+    def station_data_api_call(self):
+        return requests.get(
+            "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
+        ).json()
 
     def update_database(self):
         db = sqlite3.connect(self.DBPATHNAME)
