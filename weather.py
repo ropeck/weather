@@ -12,6 +12,7 @@ locale.setlocale(locale.LC_TIME, '')
 class Weather:
     DBPATHNAME="/home/pi/weather/weather.sqlite3"
     def __init__(self, latitude, longitude, api_id):
+        self.known_tables = []
         self.latitude = latitude
         self.longitude = longitude
         self.api_key = api_id
@@ -72,7 +73,7 @@ class Weather:
         data = {}
         for k, v in list(sd.items()) + list(sd["imperial"].items()):
             if k in data.keys():
-                raise Exception('duplicate key: {}', k)
+               raise Exception('duplicate key: {}', k)
             data[k] = v
         return data
 
@@ -86,7 +87,7 @@ class Weather:
 
     def db_create_statement(self, table, data):
         # first two columns are integer and string, the rest are float
-        cols = self.db_col_names(self.flatten_wunderground_data(data["observations"][0]))[2:]
+        cols = self.db_col_names(data)[2:]
         col_types = ''.join([f", {n} FLOAT" for n in cols])
         cmd = "CREATE TABLE {} (epoch INTEGER, obsTimeLocal STRING {});".format(
             table, col_types)
@@ -98,6 +99,11 @@ class Weather:
             table, ",".join(col_names), "?" + ",?" * (len(columns) - 1))
         db = sqlite3.connect(self.DBPATHNAME)
         cur = db.cursor()
+        if self.known_tables == []:
+            cur.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            self.known_tables = cur.fetchall()
+        if "weather" not in self.known_tables:
+            cur.execute(self.db_create_statement("weather", data))
         cur.execute("SELECT epoch FROM weather WHERE epoch = ?",
                [(data["epoch"]),])
         if cur.fetchall():

@@ -60,10 +60,11 @@ class TestWeather(TestCase):
             self.assertEqual(args[1], ['1640740178', '2021-12-28 17:09:38', '44.8', '47.8', '89.0', '0.0', '0.01',
                                        '29.5', '0.0', '47.8', '0.0', '45.7', '4.9', '4.9', '347'])
         self.assertTrue(insert_found)
-        self.assertEqual(w.db_create_statement("weather", w.station_data_api_call()),
-                         ("CREATE TABLE weather (epoch INTEGER, obsTimeLocal STRING , dewpt FLOAT, heatIndex FLOAT, "
+        self.assertEqual(("CREATE TABLE weather (epoch INTEGER, obsTimeLocal STRING , dewpt FLOAT, heatIndex FLOAT, "
                           "humidity FLOAT, precipRate FLOAT, precipTotal FLOAT, pressure FLOAT, solarRadiation FLOAT, "
-                          "temp FLOAT, uv FLOAT, windChill FLOAT, windGust FLOAT, windSpeed FLOAT, winddir FLOAT);"))
+                          "temp FLOAT, uv FLOAT, windChill FLOAT, windGust FLOAT, windSpeed FLOAT, winddir FLOAT);"),
+                         w.db_create_statement("weather", w.flatten_wunderground_data(
+                             w.station_data_api_call()["observations"][0])))
 
         if __name__ == '__main__':
             unittest.main()
