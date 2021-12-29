@@ -35,6 +35,20 @@ class Weather:
         self.update_database()
         return self.data
 
+    def station_daily_historic_data(self):
+        station_id="KCAAPTOS92"
+        api_key="5bb5ecb88c674ef9b5ecb88c67def9fb"
+        # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
+        return requests.get(
+            f"https://api.weather.com/v2/pws/dailysummary/7day?stationId={station_id}&format=json&units=e&apiKey={api_key}"
+        ).json()
+
+# hourly historic
+    # https://docs.google.com/document/d/1wzejRIUONpdGv0P3WypGEqvSmtD5RAsNOOucvdNRi6k/edit
+    # https://api.weather.com/v2/pws/observations/all/1day?stationId=KMAHANOV10&format=json&units=e&apiKey=yourApiKey
+    # https://api.weather.com/v2/pws/observations/hourly/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal
+    # https://api.weather.com/v2/pws/dailysummary/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal
+
     def forecast_api_call(self, lat, lon, api_key):
         forecast_api = f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid={api_key}&units=imperial"
         return requests.get(forecast_api).json()
