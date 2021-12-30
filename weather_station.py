@@ -77,10 +77,10 @@ def main():
 
         # LABEL
         for i in range(len(data_rain)):
-            display.draw_black.line((20 + i * 50, 175, 20 + i * 50, 195), fill=0, width=1)
-            display.draw_black.text((20 + i * 50, 195), data_rain[i][0], fill=0, font=font16)
             if data_rain[i][1] != 0:
                 display.draw_red.rectangle((20 + i * 50, 175, 20 + (i + 1) * 50, 195), fill='red')
+            display.draw_black.line((20 + i * 50, 175, 20 + i * 50, 195), fill=0, width=1)
+            display.draw_black.text((20 + i * 50, 195), data_rain[i][0], fill=0, font=font16)
     except Exception:
         pass
 
