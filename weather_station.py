@@ -73,12 +73,12 @@ def main():
         # FRAME
         display.draw_black.text((20, 150), "Pluie dans l'heure - " + time.strftime("%H:%M", time.localtime()), fill=0,
                                 font=font16)  # NEXT HOUR RAIN LABEL
-        display.draw_black.rectangle((20, 175, 320, 195), fill='white', outline=0, width=1)  # Red rectangle = rain
 
         # LABEL
         for i in range(len(data_rain)):
             if data_rain[i][1] != 0:
-                display.draw_red.rectangle((20 + i * 50, 175, 20 + (i + 1) * 50, 195), fill='red')
+                display.draw_red.rectangle((20 + i * 50, 175, 20 + (i + 1) * 50, 195), outline='black', fill='red')
+            display.draw_black.rectangle((20, 175, 320, 195), fill=None, outline=0, width=1)
             display.draw_black.line((20 + i * 50, 175, 20 + i * 50, 195), fill=0, width=1)
             display.draw_black.text((20 + i * 50, 195), data_rain[i][0], fill=0, font=font16)
     except Exception:
