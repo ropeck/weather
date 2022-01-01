@@ -12,6 +12,7 @@ class Weather:
     DBPATHNAME = "/home/pi/weather/weather.sqlite3"
 
     def __init__(self, latitude, longitude, api_id):
+        self.station_id = "KCAAPTOS92"
         self.known_tables = []
         self.latitude = latitude
         self.longitude = longitude
@@ -34,7 +35,7 @@ class Weather:
             self.update_database("weather", sd)
 
         for sd in self.station_daily_historic_data()["summaries"]:
-            self.update_database("daily", sd)
+                self.update_database("daily", sd)
 
         for sd in self.station_hourly_historic_data()["observations"]:
             self.update_database("hourly", sd)
@@ -48,33 +49,22 @@ class Weather:
         self.data = self.forecast_api_call(self.lat, self.longitude, self.api_key)
         return self.data
 
-    def station_daily_historic_data(self):
-        station_id = "KCAAPTOS92"
-        api_key = "5bb5ecb88c674ef9b5ecb88c67def9fb"
-        # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
+    def weather_api_json(self, path):
         return requests.get(
-            (f"https://api.weather.com/v2/pws/dailysummary/7day?"
-             f"stationId={station_id}&format=json&units=e&apiKey={api_key}")
-        ).json()
+            f"https://api.weather.com/v2/pws/{path}?"
+            f"stationId={self.station_id}&format=json&units=e&apiKey={self.api_key}").json()
+
+    def station_daily_historic_data(self):
+        # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
+        return self.weather_api_json("dailysummary/7day")
 
     def station_hourly_historic_data(self):
-        station_id = "KCAAPTOS92"
-        api_key = "5bb5ecb88c674ef9b5ecb88c67def9fb"
         # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
-        return requests.get(
-            (f"https://api.weather.com/v2/pws/observations/hourly/7day?"
-             f"stationId={station_id}&format=json&units=e&apiKey={api_key}")
-        ).json()
-
+        return self.weather_api_json("observations/hourly/7day")
 
     def station_rapid_historic_data(self):
-        station_id = "KCAAPTOS92"
-        api_key = "5bb5ecb88c674ef9b5ecb88c67def9fb"
         # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
-        return requests.get(
-            (f"https://api.weather.com/v2/pws/observations/all/1day?"
-             f"stationId={station_id}&format=json&units=e&apiKey={api_key}")
-        ).json()
+        return self.weather_api_json("observations/all/1day")
 
     # hourly historic
     # https://docs.google.com/document/d/1wzejRIUONpdGv0P3WypGEqvSmtD5RAsNOOucvdNRi6k/edit
@@ -93,10 +83,6 @@ class Weather:
 
     def update_database(self, table, sd):
         data = self.flatten_wunderground_data(sd)
-        col_names = [
-            "epoch", "solarRadiation", "uv", "winddir", "humidity",
-            "temp", "windSpeed", "windGust", "pressure", "precipRate",
-            "precipTotal"]
         self.insert_if_new(table, self.db_col_names(data), data)
 
     def flatten_wunderground_data(self, sd):

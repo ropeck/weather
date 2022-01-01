@@ -14,6 +14,10 @@ class TestWeather(TestCase):
         self.mock_sql = p.start()
         self.addCleanup(p.stop)
         self.mock_sql.connect().cursor().fetchall.return_value = []
+# patch Weather.weather_api_json(path) to return example calls for each API
+# or patch requests.get() to return the data for the URL request for an example call
+# like this https://api.weather.com/v2/pws/observations/hourly/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal
+#... save the results to file to return named after the path "observations_hourly_7day.json" for example here
 
         p = patch('weather.Weather.station_data_api_call', return_value={
             'observations': [
