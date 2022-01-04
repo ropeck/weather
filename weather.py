@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import locale
+import os
 import sqlite3
 import time
 
@@ -49,10 +50,20 @@ class Weather:
         self.data = self.forecast_api_call(self.lat, self.longitude, self.api_key)
         return self.data
 
-    def weather_api_json(self, path):
-        return requests.get(
-            f"https://api.weather.com/v2/pws/{path}?"
-            f"stationId={self.station_id}&format=json&units=e&apiKey={self.api_key}").json()
+    def weather_api_json(self, api_path):
+
+        json_dict = requests.get(f"https://api.weather.com/v2/pws/{api_path}?" \
+                            f"stationId={self.station_id}&format=json&units=e&apiKey={self.api_key}").json()
+        data_path = os.getenv("WEATHER_API_RESPONSE_PATH")
+
+        if data_path:
+            api_path_str = re.sub("/","_",api_path)
+            pathname = f'{data_path}/{api_path_str}_{int(time.time())}.data'
+            with open(pathname) as fh:
+                json.dump(json_dict, fh)
+            print("logged {pathname}")
+
+        return json_dict
 
     def station_daily_historic_data(self):
         # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit
