@@ -18,6 +18,7 @@ class Weather:
         self.latitude = latitude
         self.longitude = longitude
         self.api_key = api_id
+        self.api_key_wunderground = "5bb5ecb88c674ef9b5ecb88c67def9fb"
         self.update()
         self.prevision = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]
         self.prevision[0] = self.data["daily"][0]["dt"]
@@ -52,8 +53,9 @@ class Weather:
 
     def weather_api_json(self, api_path):
 
-        json_dict = requests.get(f"https://api.weather.com/v2/pws/{api_path}?" \
-                            f"stationId={self.station_id}&format=json&units=e&apiKey={self.api_key}").json()
+        api_url = (f"https://api.weather.com/v2/pws/{api_path}?"
+                   f"stationId={self.station_id}&format=json&units=e&apiKey={self.api_key_wunderground}")
+        json_dict = requests.get(api_url).json()
         data_path = os.getenv("WEATHER_API_RESPONSE_PATH")
 
         if data_path:
