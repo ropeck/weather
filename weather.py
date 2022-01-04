@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*-
+import json
 import locale
 import os
+import re
 import sqlite3
 import time
 
@@ -60,8 +62,8 @@ class Weather:
 
         if data_path:
             api_path_str = re.sub("/","_",api_path)
-            pathname = f'{data_path}/{api_path_str}_{int(time.time())}.data'
-            with open(pathname) as fh:
+            pathname = f'{data_path}/{api_path_str}_{int(time.time())}.json'
+            with open(pathname, "w") as fh:
                 json.dump(json_dict, fh)
             print("logged {pathname}")
 
