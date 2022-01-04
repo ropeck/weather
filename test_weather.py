@@ -1,23 +1,39 @@
 import json
-from unittest import TestCase
+import re
 import unittest
 
 from mock import patch
 
 import weather
 
+def _requests_get_response(arg):
+    class MockResponse:
+        def __init__(self, data):
+            self.data = data
+        def json(self):
+            return self.data
+    p = re.compile(r'https://api.weather.com/v2/pws/(\S+)/(\S+)\?stationId=.*&format=json&units=e&apiKey=apikey')
+    m = p.match(arg)
+    if not m:
+        raise("request format incorrect")
+    api_method=m[1]
+    api_args=m[2]
+    if api_method == "dailysummary":
+        return MockResponse({"summaries": []})
+    else:
+        return MockResponse({"observations": []})
 
-class TestWeather(TestCase):
+class TestWeather(unittest.TestCase):
     def setUp(self) -> None:
         super(TestWeather, self).setUp()
         p = patch('weather.sqlite3')
         self.mock_sql = p.start()
         self.addCleanup(p.stop)
         self.mock_sql.connect().cursor().fetchall.return_value = []
-# patch Weather.weather_api_json(path) to return example calls for each API
-# or patch requests.get() to return the data for the URL request for an example call
-# like this https://api.weather.com/v2/pws/observations/hourly/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal
-#... save the results to file to return named after the path "observations_hourly_7day.json" for example here
+        # patch Weather.weather_api_json(path) to return example calls for each API
+        # or patch requests.get() to return the data for the URL request for an example call
+        # like this https://api.weather.com/v2/pws/observations/hourly/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal
+        # ... save the results to file to return named after the path "observations_hourly_7day.json" for example here
 
         p = patch('weather.Weather.station_data_api_call', return_value={
             'observations': [
@@ -35,6 +51,10 @@ class TestWeather(TestCase):
             p = patch('weather.Weather.forecast_api_call', return_value=json.load(fh))
             p.start()
             self.addCleanup(p.stop)
+
+        p = patch('requests.get', side_effect=_requests_get_response)
+        self.mock_requests = p.start()
+        self.addCleanup(p.stop)
 
     # TODO: collect station data for 5minute and hourly updates and save to databases
     # TODO: add testing for all that too
@@ -70,6 +90,9 @@ class TestWeather(TestCase):
                           "temp FLOAT, uv FLOAT, windChill FLOAT, windGust FLOAT, windSpeed FLOAT, winddir FLOAT);"),
                          w.db_create_statement("weather", w.flatten_wunderground_data(
                              w.station_data_api_call()["observations"][0])))
+
+    def test_weather_api_json(self):
+        self.fail()
 
 if __name__ == '__main__':
     unittest.main()
