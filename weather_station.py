@@ -242,7 +242,7 @@ def main():
     try:
         display.im_black.save("weather.png")
         print("\tClearing Screen...")
-        if debug ==0:
+        if not debug:
             # display.im_black.show()
             # display.im_red.show()
             epd.init()
