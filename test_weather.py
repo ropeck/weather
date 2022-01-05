@@ -56,18 +56,17 @@ class TestWeather(unittest.TestCase):
         self.mock_requests = p.start()
         self.addCleanup(p.stop)
 
+        lat = "36.9"
+        lon = "-121.9"
+        api_key_weather = "forecastapikey"
+        self.weather = weather.Weather(lat, lon, "stationid", api_key_weather, "wundergroundapikey")
+
+        self.mock_sql.connect().cursor().fetchall.return_value = [(1640740178,)]
     # TODO: collect station data for 5minute and hourly updates and save to databases
     # TODO: add testing for all that too
 
     def test_update_database(self):
-        lat = "36.9"
-        lon = "-121.9"
-        api_key_weather = "forecastapikey"
-        w = weather.Weather(lat, lon, "stationid", api_key_weather, "wundergroundapikey")
-
-        self.mock_sql.connect().cursor().fetchall.return_value = [(1640740178,)]
-
-        w.update()
+        self.weather.update()
         ex = self.mock_sql.connect().cursor().execute
 
         self.assertEqual(1, sum('INSERT INTO weather' in args[0] for (args, _) in ex.call_args_list),
@@ -88,11 +87,11 @@ class TestWeather(unittest.TestCase):
         self.assertEqual(("CREATE TABLE weather (epoch INTEGER, obsTimeLocal STRING , dewpt FLOAT, heatIndex FLOAT, "
                           "humidity FLOAT, precipRate FLOAT, precipTotal FLOAT, pressure FLOAT, solarRadiation FLOAT, "
                           "temp FLOAT, uv FLOAT, windChill FLOAT, windGust FLOAT, windSpeed FLOAT, winddir FLOAT);"),
-                         w.db_create_statement("weather", w.flatten_wunderground_data(
-                             w.station_data_api_call()["observations"][0])))
+                         self.weather.db_create_statement("weather", self.weather.flatten_wunderground_data(
+                             self.weather.station_data_api_call()["observations"][0])))
 
     def test_weather_api_json(self):
-        self.fail()
+        self.assertEqual(self.weather.weather_api_json("foo/bar"), {'observations': []})
 
 if __name__ == '__main__':
     unittest.main()
