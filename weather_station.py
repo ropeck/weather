@@ -20,8 +20,11 @@ lon = "-121.9"
 # TODO: use lat/long from wunderground PWS data
 # TODO: add PWS to config data
 
+# replace this config section with os.getenv lookup or a config file, or both
 api_key_weather = "b69ed8db8927bd983bf8388c067c5626"
 api_key_news = "72064d803ca1466ca192b1031038cbbc"
+api_key_wunderground = "5bb5ecb88c674ef9b5ecb88c67def9fb"
+
 debug = 0  # If debug != 0 -> debug on
 if debug == 0:
     import epd5in65f
@@ -282,7 +285,7 @@ if __name__ == "__main__":
 
     while True:
         try:
-            weather = Weather(lat, lon, api_key_weather)
+            weather = Weather(lat, lon, api_key_weather, api_key_wunderground)
             # pollution = Pollution()
             news = News()
             break
@@ -317,7 +320,7 @@ if __name__ == "__main__":
             else :
                 pass
             exit()
-        except IOException as e:
+        except Exception as e:
             current_time = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
             print("PROBLEM OCCURRED WHILE REFRESHING - NEXT TRY 1000s - @" + current_time)
             print(str(e))

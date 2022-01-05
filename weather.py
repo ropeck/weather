@@ -14,13 +14,13 @@ locale.setlocale(locale.LC_TIME, '')
 class Weather:
     DBPATHNAME = "/home/pi/weather/weather.sqlite3"
 
-    def __init__(self, latitude, longitude, api_id):
+    def __init__(self, latitude, longitude, weather_api_key, wunderground_api_key):
         self.station_id = "KCAAPTOS92"
         self.known_tables = []
         self.latitude = latitude
         self.longitude = longitude
-        self.api_key = api_id
-        self.api_key_wunderground = "5bb5ecb88c674ef9b5ecb88c67def9fb"
+        self.weather_api_key = weather_api_key
+        self.api_key_wunderground = wunderground_api_key
         self.update()
         self.prevision = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]
         self.prevision[0] = self.data["daily"][0]["dt"]
@@ -50,7 +50,7 @@ class Weather:
         obs = self.station_data["observations"][0]
         self.lat = obs["lat"]
         self.longitude = obs["lon"]
-        self.data = self.forecast_api_call(self.lat, self.longitude, self.api_key)
+        self.data = self.forecast_api_call(self.lat, self.longitude, self.weather_api_key)
         return self.data
 
     def weather_api_json(self, api_path):
@@ -61,11 +61,11 @@ class Weather:
         data_path = os.getenv("WEATHER_API_RESPONSE_PATH")
 
         if data_path:
-            api_path_str = re.sub("/","_",api_path)
+            api_path_str = re.sub("/", "_", api_path)
             pathname = f'{data_path}/{api_path_str}_{int(time.time())}.json'
             with open(pathname, "w") as fh:
                 json.dump(json_dict, fh)
-            print("logged {pathname}")
+            print(f"logged {pathname}")
 
         return json_dict
 
