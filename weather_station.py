@@ -16,6 +16,8 @@ import epd5in65f
 import json
 import traceback
 
+# replace this startup / init layout stuff
+global been_reboot
 
 def map_resize(val, in_mini, in_maxi, out_mini, out_maxi):
     if in_maxi - in_mini != 0:
@@ -264,6 +266,8 @@ def main():
 
 
 if __name__ == "__main__":
+    been_reboot = True
+
     epd = epd5in65f.EPD()
     debug = os.getenv("WEATHER_DEBUG")
 
