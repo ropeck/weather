@@ -18,6 +18,8 @@ import traceback
 
 # replace this startup / init layout stuff
 global been_reboot
+global debug
+debug = False
 
 def map_resize(val, in_mini, in_maxi, out_mini, out_maxi):
     if in_maxi - in_mini != 0:
@@ -266,6 +268,8 @@ def main():
 
 
 if __name__ == "__main__":
+    global debug
+    global been_reboot
     been_reboot = True
 
     epd = epd5in65f.EPD()
