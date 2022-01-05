@@ -284,7 +284,7 @@ if __name__ == "__main__":
     station_id = os.getenv("WEATHER_STATION_ID")
     while True:
         try:
-            weather = Weather(lat, lon, station_id, api_key_weather, api_key_wunderground)
+            weather = Weather(station_id, lat, lon, api_key_weather, api_key_wunderground)
             # pollution = Pollution()
             news = News()
             break
