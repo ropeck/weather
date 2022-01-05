@@ -268,8 +268,6 @@ def main():
 
 
 if __name__ == "__main__":
-    global debug
-    global been_reboot
     been_reboot = True
 
     epd = epd5in65f.EPD()
