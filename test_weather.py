@@ -12,10 +12,10 @@ def _requests_get_response(arg):
             self.data = data
         def json(self):
             return self.data
-    p = re.compile(r'https://api.weather.com/v2/pws/(\S+)/(\S+)\?stationId=.*&format=json&units=e&apiKey=apikey')
+    p = re.compile(r'https://api.weather.com/v2/pws/(\S+)/(\S+)\?stationId=.*&format=json&units=e&apiKey=.*')
     m = p.match(arg)
     if not m:
-        raise("request format incorrect")
+        raise ValueError(f"request api format incorrect: {arg}")
     api_method=m[1]
     api_args=m[2]
     if api_method == "dailysummary":
@@ -62,8 +62,8 @@ class TestWeather(unittest.TestCase):
     def test_update_database(self):
         lat = "36.9"
         lon = "-121.9"
-        api_key_weather = "apikey"
-        w = weather.Weather(lat, lon, api_key_weather)
+        api_key_weather = "forecastapikey"
+        w = weather.Weather(lat, lon, api_key_weather, "wundergroundapikey")
 
         self.mock_sql.connect().cursor().fetchall.return_value = [(1640740178,)]
 

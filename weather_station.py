@@ -9,27 +9,13 @@
 # -*- coding:utf-8 -*-
 # -*- coding:utf-8 -*-
 
-from weather import *
-from news import *
 from display import *
+from news import *
+from weather import *
+import epd5in65f
 import json
 import traceback
 
-lat = "36.9"
-lon = "-121.9"
-# TODO: use lat/long from wunderground PWS data
-# TODO: add PWS to config data
-
-# replace this config section with os.getenv lookup or a config file, or both
-api_key_weather = "b69ed8db8927bd983bf8388c067c5626"
-api_key_news = "72064d803ca1466ca192b1031038cbbc"
-api_key_wunderground = "5bb5ecb88c674ef9b5ecb88c67def9fb"
-
-debug = 0  # If debug != 0 -> debug on
-if debug == 0:
-    import epd5in65f
-else:
-    pass
 
 def map_resize(val, in_mini, in_maxi, out_mini, out_maxi):
     if in_maxi - in_mini != 0:
@@ -40,7 +26,7 @@ def map_resize(val, in_mini, in_maxi, out_mini, out_maxi):
 
 
 def main():
-    ############################################################################
+    ###########################################################################
     # FRAME
     display.draw_black.rectangle((5, 5, 795, 475), fill='white', outline=0, width=2)  # INNER FRAME
     display.draw_black.line((540, 5, 540, 350), fill=0, width=1)  # VERTICAL SEPARATION
@@ -278,11 +264,17 @@ def main():
 
 
 if __name__ == "__main__":
-    global been_reboot
-    been_reboot=1
-
     epd = epd5in65f.EPD()
+    debug = os.getenv("WEATHER_DEBUG")
 
+    lat = os.getenv("WEATHER_LAT")
+    lon = os.getenv("WEATHER_LONG")
+    # TODO: use lat/long from wunderground PWS data
+    # TODO: add PWS to config data
+
+    api_key_weather = os.getenv("WEATHER_FORECAST_API_KEY")
+    api_key_news = os.getenv("WEATHER_NEWS_API_KEY")
+    api_key_wunderground = os.getenv("WEATHER_WUNDERGROUND_API_KEY")
     while True:
         try:
             weather = Weather(lat, lon, api_key_weather, api_key_wunderground)
