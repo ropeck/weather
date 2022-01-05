@@ -6,22 +6,25 @@ from mock import patch
 
 import weather
 
-def _requests_get_response(arg):
-    class MockResponse:
-        def __init__(self, data):
-            self.data = data
-        def json(self):
-            return self.data
-    p = re.compile(r'https://api.weather.com/v2/pws/(\S+)/(\S+)\?stationId=.*&format=json&units=e&apiKey=.*')
-    m = p.match(arg)
-    if not m:
-        raise ValueError(f"request api format incorrect: {arg}")
-    api_method=m[1]
-    api_args=m[2]
-    if api_method == "dailysummary":
-        return MockResponse({"summaries": []})
-    else:
-        return MockResponse({"observations": []})
+def _requests_get_response(caller):
+    def wrapper(arg):
+        class MockResponse:
+            def __init__(self, data):
+                self.data = data
+                self.caller = caller
+            def json(self):
+                return self.data
+        p = re.compile(r'https://api.weather.com/v2/pws/(\S+)/(\S+)\?stationId=.*&format=json&units=e&apiKey=.*')
+        m = p.match(arg)
+        if not m:
+            raise ValueError(f"request api format incorrect: {arg}")
+        api_method=m[1]
+        api_args=m[2]
+        if api_method == "dailysummary":
+            return MockResponse({"summaries": []})
+        else:
+            return MockResponse({"observations": []})
+    return wrapper
 
 class TestWeather(unittest.TestCase):
     def setUp(self) -> None:
@@ -52,7 +55,7 @@ class TestWeather(unittest.TestCase):
             p.start()
             self.addCleanup(p.stop)
 
-        p = patch('requests.get', side_effect=_requests_get_response)
+        p = patch('requests.get', side_effect=_requests_get_response(self))
         self.mock_requests = p.start()
         self.addCleanup(p.stop)
 
