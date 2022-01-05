@@ -63,7 +63,7 @@ class TestWeather(unittest.TestCase):
         lat = "36.9"
         lon = "-121.9"
         api_key_weather = "forecastapikey"
-        w = weather.Weather(lat, lon, api_key_weather, "wundergroundapikey")
+        w = weather.Weather(lat, lon, "stationid", api_key_weather, "wundergroundapikey")
 
         self.mock_sql.connect().cursor().fetchall.return_value = [(1640740178,)]
 

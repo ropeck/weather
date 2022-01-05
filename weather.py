@@ -14,8 +14,8 @@ locale.setlocale(locale.LC_TIME, '')
 class Weather:
     DBPATHNAME = "/home/pi/weather/weather.sqlite3"
 
-    def __init__(self, latitude, longitude, weather_api_key, wunderground_api_key):
-        self.station_id = "KCAAPTOS92"
+    def __init__(self, station_id, latitude, longitude, weather_api_key, wunderground_api_key):
+        self.station_id = station_id
         self.known_tables = []
         self.latitude = latitude
         self.longitude = longitude
