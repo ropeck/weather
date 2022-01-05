@@ -162,13 +162,13 @@ def main():
 
 
     #weather.graph_p_t()
-    data = weather.prevision[1]
+    data = weather.forecast[1]
     global been_reboot #If reboot load the saved infos
     if (been_reboot == 1):
         try :
             file = open("saved.txt","r")
-            weather.prevision[1] = json.loads(file.read())
-            data = weather.prevision[1]
+            weather.forecast[1] = json.loads(file.read())
+            data = weather.forecast[1]
             been_reboot = 0
             file.close()
         except:

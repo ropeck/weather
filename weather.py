@@ -22,10 +22,10 @@ class Weather:
         self.weather_api_key = weather_api_key
         self.api_key_wunderground = wunderground_api_key
         self.update()
-        self.prevision = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]
-        self.prevision[0] = self.data["daily"][0]["dt"]
-        self.prevision[1][6] = [self.data["daily"][0]["pressure"],
-                                round(self.data["daily"][0]["temp"]["day"], 0)]
+        self.forecast = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]
+        self.forecast[0] = self.data["daily"][0]["dt"]
+        self.forecast[1][6] = [self.data["daily"][0]["pressure"],
+                               round(self.data["daily"][0]["temp"]["day"], 0)]
 
     def station_daily_rain(self):
         return round(self.station_data["observations"][0]["imperial"]["precipTotal"], 2)
@@ -243,10 +243,10 @@ class Weather:
         return daily
 
     def graph_p_t(self):
-        if self.prevision[0] != self.data["daily"][0]["dt"]:
-            self.prevision[0] = self.data["daily"][0]["dt"]
-            self.prevision = [self.prevision[0], self.prevision[1][1:]]
-            self.prevision[1].append(
+        if self.forecast[0] != self.data["daily"][0]["dt"]:
+            self.forecast[0] = self.data["daily"][0]["dt"]
+            self.forecast = [self.forecast[0], self.forecast[1][1:]]
+            self.forecast[1].append(
                 [self.data["daily"][0]["pressure"], round(self.data["daily"][0]["temp"]["day"], 0)])
 
     def weather_description(self, id):
