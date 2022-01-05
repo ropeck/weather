@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import unittest
 
@@ -7,11 +8,11 @@ from mock import patch
 import weather
 
 def _requests_get_response(caller):
+    caller.datafileindex = {}
     def wrapper(arg):
         class MockResponse:
             def __init__(self, data):
                 self.data = data
-                self.caller = caller
             def json(self):
                 return self.data
         p = re.compile(r'https://api.weather.com/v2/pws/(\S+)/(\S+)\?stationId=.*&format=json&units=e&apiKey=.*')
@@ -20,10 +21,22 @@ def _requests_get_response(caller):
             raise ValueError(f"request api format incorrect: {arg}")
         api_method=m[1]
         api_args=m[2]
-        if api_method == "dailysummary":
-            return MockResponse({"summaries": []})
+        datafile_path = re.sub("/", "_", f"{api_method}/{api_args}")
+        files = [x for x in os.listdir("data") if x.startswith(f"{datafile_path}_")]
+        if len(files) == 0:
+            raise ValueError(f"no datafiles found for {arg} path {datafile_path}, found {files}, {os.getcwd()}")
+        if len(files) == 1:
+            path = files[0]
         else:
-            return MockResponse({"observations": []})
+            ix = caller.datafileindex.get(datafile_path, 0)
+            path = files[ix]
+            caller.datafileindex[datafile_path] = ix + 1
+            # what about when ix > len(files)?  we will see when that happens
+
+        with open(f"data/{path}") as fh:
+            resp = json.load(fh)
+        print(f"mock api {datafile_path} {path}")
+        return MockResponse(resp)
     return wrapper
 
 class TestWeather(unittest.TestCase):
