@@ -25,6 +25,7 @@ def _requests_get_response(caller):
         api_args=m[2]
         datafile_path = re.sub("/", "_", f"{api_method}/{api_args}")
         files = [x for x in os.listdir("data") if x.startswith(f"{datafile_path}_")]
+        files.sort()
         if len(files) == 0:
             return MockResponse({"error": f"no datafiles found for {arg} path {datafile_path}, found {files}, {os.getcwd()}"},
                                  status_code=401)
