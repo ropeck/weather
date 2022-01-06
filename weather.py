@@ -57,7 +57,11 @@ class Weather:
 
         api_url = (f"https://api.weather.com/v2/pws/{api_path}?"
                    f"stationId={self.station_id}&format=json&units=e&apiKey={self.api_key_wunderground}")
-        json_dict = requests.get(api_url).json()
+        response = requests.get(api_url)
+        if response.status_code != 200:
+            raise ValueError(f"status code {response.status_code} in {api_url} -- {response.text}")
+        json_dict = response.json()
+
         data_path = os.getenv("WEATHER_API_RESPONSE_PATH")
 
         if data_path:
@@ -142,7 +146,8 @@ class Weather:
                     [(data["epoch"]), ])
         if cur.fetchall():
             return
-        print(query, str(columns))
+        if os.getenv("WEATHER_DEBUG"):
+            print(query, str(columns))
         cur.execute(query, columns)
         cur.close()
         db.commit()

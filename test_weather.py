@@ -11,10 +11,11 @@ def _requests_get_response(caller):
     caller.datafileindex = {}
     def wrapper(arg):
         class MockResponse:
-            def __init__(self, data):
-                self.data = data
+            def __init__(self, text, status_code=200):
+                self.text = text
+                self.status_code = status_code
             def json(self):
-                return self.data
+                return self.text
         p = re.compile(r'https://api.weather.com/v2/pws/(\S+)/(\S+)\?stationId=.*&format=json&units=e&apiKey=.*')
         m = p.match(arg)
         if not m:
@@ -24,7 +25,8 @@ def _requests_get_response(caller):
         datafile_path = re.sub("/", "_", f"{api_method}/{api_args}")
         files = [x for x in os.listdir("data") if x.startswith(f"{datafile_path}_")]
         if len(files) == 0:
-            raise ValueError(f"no datafiles found for {arg} path {datafile_path}, found {files}, {os.getcwd()}")
+            return MockResponse({"error": f"no datafiles found for {arg} path {datafile_path}, found {files}, {os.getcwd()}"},
+                                 status_code=401)
         if len(files) == 1:
             path = files[0]
         else:
@@ -106,8 +108,9 @@ class TestWeather(unittest.TestCase):
                          self.weather.db_create_statement("weather", self.weather.flatten_wunderground_data(
                              self.weather.station_data_api_call()["observations"][0])))
 
-    def test_weather_api_json(self):
-        self.assertEqual(self.weather.weather_api_json("foo/bar"), {'observations': []})
+    def test_weather_api_json_bad_method_path(self):
+        with self.assertRaises(ValueError):
+            self.weather.weather_api_json("foo/bar")
 
 if __name__ == '__main__':
     unittest.main()
