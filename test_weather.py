@@ -6,27 +6,31 @@ import re
 import unittest
 import weather
 
+
 def _requests_get_response(caller):
     caller.datafileindex = {}
+
     def wrapper(arg):
         class MockResponse:
             def __init__(self, text, status_code=200):
                 self.text = text
                 self.status_code = status_code
+
             def json(self):
                 return self.text
         p = re.compile(r'https://api.weather.com/v2/pws/(\S+)/(\S+)\?stationId=.*&format=json&units=e&apiKey=.*')
         m = p.match(arg)
         if not m:
             raise ValueError(f"request api format incorrect: {arg}")
-        api_method=m[1]
-        api_args=m[2]
+        api_method = m[1]
+        api_args = m[2]
         datafile_path = re.sub("/", "_", f"{api_method}/{api_args}")
         files = [x for x in os.listdir("data") if x.startswith(f"{datafile_path}_")]
         files.sort()
         if len(files) == 0:
-            return MockResponse({"error": f"no datafiles found for {arg} path {datafile_path}, found {files}, {os.getcwd()}"},
-                                 status_code=401)
+            return MockResponse(
+                {"error": f"no datafiles found for {arg} path {datafile_path}, found {files}, {os.getcwd()}"},
+                status_code=401)
         if len(files) == 1:
             path = files[0]
         else:
@@ -41,6 +45,7 @@ def _requests_get_response(caller):
         return MockResponse(resp)
     return wrapper
 
+
 class TestWeather(unittest.TestCase):
     def setUp(self) -> None:
         super(TestWeather, self).setUp()
@@ -48,10 +53,6 @@ class TestWeather(unittest.TestCase):
         self.mock_sql = p.start()
         self.addCleanup(p.stop)
         self.mock_sql.connect().cursor().fetchall.return_value = []
-        # patch Weather.weather_api_json(path) to return example calls for each API
-        # or patch requests.get() to return the data for the URL request for an example call
-        # like this https://api.weather.com/v2/pws/observations/hourly/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal
-        # ... save the results to file to return named after the path "observations_hourly_7day.json" for example here
 
         p = mock.patch('weather.Weather.station_data_api_call', return_value={
             'observations': [
@@ -69,7 +70,7 @@ class TestWeather(unittest.TestCase):
             p = mock.patch('weather.Weather.forecast_api_call', return_value=json.load(fh))
             p.start()
             self.addCleanup(p.stop)
-
+        self.datafileindex = {}
         p = mock.patch('requests.get', side_effect=_requests_get_response(self))
         self.mock_requests = p.start()
         self.addCleanup(p.stop)
