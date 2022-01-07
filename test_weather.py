@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 import json
 import os
+import mock
 import re
 import unittest
-
-from mock import patch
-
 import weather
 
 def _requests_get_response(caller):
@@ -46,7 +44,7 @@ def _requests_get_response(caller):
 class TestWeather(unittest.TestCase):
     def setUp(self) -> None:
         super(TestWeather, self).setUp()
-        p = patch('weather.sqlite3')
+        p = mock.patch('weather.sqlite3')
         self.mock_sql = p.start()
         self.addCleanup(p.stop)
         self.mock_sql.connect().cursor().fetchall.return_value = []
@@ -55,7 +53,7 @@ class TestWeather(unittest.TestCase):
         # like this https://api.weather.com/v2/pws/observations/hourly/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal
         # ... save the results to file to return named after the path "observations_hourly_7day.json" for example here
 
-        p = patch('weather.Weather.station_data_api_call', return_value={
+        p = mock.patch('weather.Weather.station_data_api_call', return_value={
             'observations': [
                 {'stationID': 'KCAAPTOS92', 'obsTimeUtc': '2021-12-29T01:09:38Z', 'obsTimeLocal': '2021-12-28 17:09:38',
                  'neighborhood': 'Seacliff Beach, Aptos', 'softwareType': 'WS-1002 V2.4.5', 'country': 'US',
@@ -68,11 +66,11 @@ class TestWeather(unittest.TestCase):
         self.addCleanup(p.stop)
 
         with open("data/forecast.json") as fh:
-            p = patch('weather.Weather.forecast_api_call', return_value=json.load(fh))
+            p = mock.patch('weather.Weather.forecast_api_call', return_value=json.load(fh))
             p.start()
             self.addCleanup(p.stop)
 
-        p = patch('requests.get', side_effect=_requests_get_response(self))
+        p = mock.patch('requests.get', side_effect=_requests_get_response(self))
         self.mock_requests = p.start()
         self.addCleanup(p.stop)
 
