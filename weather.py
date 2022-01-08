@@ -54,23 +54,23 @@ class Weather:
         return self.data
 
     def weather_api_json(self, api_path):
-
         api_url = (f"https://api.weather.com/v2/pws/{api_path}?"
                    f"stationId={self.station_id}&format=json&units=e&apiKey={self.api_key_wunderground}")
+        return self.get_api_method_json(api_url)
+
+    def get_api_method_json(self, api_url):
         response = requests.get(api_url)
         if response.status_code != 200:
             raise ValueError(f"status code {response.status_code} in {api_url} -- {response.text}")
         json_dict = response.json()
-
-        data_path = os.getenv("WEATHER_API_RESPONSE_PATH")
-
+        data_path = os.getenv("WEATHER_API_RESPONSE_PATH") or True
         if data_path:
-            api_path_str = re.sub("/", "_", api_path)
-            pathname = f'{data_path}/{api_path_str}_{int(time.time())}.json'
+            url = re.sub("\?.*$", "", api_url).split("/")[2:]
+            api_url_str = re.sub("/", "_", "/".join(url))
+            pathname = f'{data_path}/{api_url_str}_{int(time.time())}.json'
             with open(pathname, "w") as fh:
                 json.dump(json_dict, fh)
             print(f"logged {pathname}")
-
         return json_dict
 
     def station_daily_historic_data(self):
@@ -93,12 +93,12 @@ class Weather:
 
     def forecast_api_call(self, lat, lon, api_key):
         forecast_api = f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid={api_key}&units=imperial"
-        return requests.get(forecast_api).json()
+        return self.get_api_method_json(forecast_api)
 
     def station_data_api_call(self):
-        return requests.get(
+        return self.get_api_method_json(
             "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
-        ).json()
+        )
 
     def update_database(self, table, sd):
         data = self.flatten_wunderground_data(sd)
