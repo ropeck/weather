@@ -63,7 +63,7 @@ class Weather:
         if response.status_code != 200:
             raise ValueError(f"status code {response.status_code} in {api_url} -- {response.text}")
         json_dict = response.json()
-        data_path = os.getenv("WEATHER_API_RESPONSE_PATH") or True
+        data_path = os.getenv("WEATHER_API_RESPONSE_PATH")
         if data_path:
             url = re.sub("\?.*$", "", api_url).split("/")[2:]
             api_url_str = re.sub("/", "_", "/".join(url))
