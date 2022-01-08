@@ -51,23 +51,6 @@ class TestWeather(unittest.TestCase):
         self.mock_sql = p.start()
         self.addCleanup(p.stop)
         self.mock_sql.connect().cursor().fetchall.return_value = []
-
-        # p = mock.patch('weather.Weather.station_data_api_call', return_value={
-        #     'observations': [
-        #         {'stationID': 'KCAAPTOS92', 'obsTimeUtc': '2021-12-29T01:09:38Z', 'obsTimeLocal': '2021-12-28 17:09:38',
-        #          'neighborhood': 'Seacliff Beach, Aptos', 'softwareType': 'WS-1002 V2.4.5', 'country': 'US',
-        #          'solarRadiation': 0.0, 'lon': -121.908257, 'realtimeFrequency': None, 'epoch': 1640740178,
-        #          'lat': 36.973396, 'uv': 0.0, 'winddir': 347, 'humidity': 89.0, 'qcStatus': 1,
-        #          'imperial': {'temp': 47.8, 'heatIndex': 47.8, 'dewpt': 44.8, 'windChill': 45.7, 'windSpeed': 4.9,
-        #                       'windGust': 4.9, 'pressure': 29.5, 'precipRate': 0.0, 'precipTotal': 0.01,
-        #                       'elev': 115.0}}]})
-        # p.start()
-        # self.addCleanup(p.stop)
-
-        with open("data/forecast.json") as fh:
-            p = mock.patch('weather.Weather.forecast_api_call', return_value=json.load(fh))
-            p.start()
-            self.addCleanup(p.stop)
         self.datafileindex = {}
         p = mock.patch('requests.get', side_effect=_requests_get_response(self))
         self.mock_requests = p.start()
