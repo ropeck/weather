@@ -96,6 +96,10 @@ class TestWeather(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.weather.weather_api_json("foo/bar")
 
+# can add tide and noaa weather info to display
+# https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=NOS.COOPS.TAC.WL&begin_date=20220108&end_date=20220209&datum=MLLW&station=9414290&time_zone=lst_ldt&units=english&interval=hilo&format=json
+# https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations/9414290.json
+
 
 if __name__ == '__main__':
     unittest.main()
