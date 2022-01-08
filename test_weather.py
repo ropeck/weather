@@ -18,13 +18,8 @@ def _requests_get_response(caller):
 
             def json(self):
                 return self.text
-        p = re.compile(r'https://api.weather.com/v2/pws/(\S+)/(\S+)\?stationId=.*&format=json&units=e&apiKey=.*')
-        m = p.match(arg)
-        if not m:
-            raise ValueError(f"request api format incorrect: {arg}")
-        api_method = m[1]
-        api_args = m[2]
-        datafile_path = re.sub("/", "_", f"{api_method}/{api_args}")
+        url_arg = re.sub("\?.*$", "", arg).split("/")[2:]
+        datafile_path = "_".join(url_arg)
         files = [x for x in os.listdir("data") if x.startswith(f"{datafile_path}_")]
         files.sort()
         if len(files) == 0:
