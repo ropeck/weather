@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 import json
 import os
-import mock
 import re
 import unittest
+
+import mock
+
 import weather
 
 
@@ -18,6 +20,7 @@ def _requests_get_response(caller):
 
             def json(self):
                 return self.text
+
         url_arg = re.sub("\?.*$", "", arg).split("/")[2:]
         datafile_path = "_".join(url_arg)
         files = [x for x in os.listdir("data") if x.startswith(f"{datafile_path}_")]
@@ -31,13 +34,13 @@ def _requests_get_response(caller):
         else:
             ix = caller.datafileindex.get(datafile_path, 0)
             path = files[ix]
-            caller.datafileindex[datafile_path] = ix + 1
-            # what about when ix > len(files)?  we will see when that happens
+            caller.datafileindex[datafile_path] = min(ix + 1, len(files)-1)
 
         with open(f"data/{path}") as fh:
             resp = json.load(fh)
         print(f"mock api {datafile_path} {path}")
         return MockResponse(resp)
+
     return wrapper
 
 
@@ -49,17 +52,17 @@ class TestWeather(unittest.TestCase):
         self.addCleanup(p.stop)
         self.mock_sql.connect().cursor().fetchall.return_value = []
 
-        p = mock.patch('weather.Weather.station_data_api_call', return_value={
-            'observations': [
-                {'stationID': 'KCAAPTOS92', 'obsTimeUtc': '2021-12-29T01:09:38Z', 'obsTimeLocal': '2021-12-28 17:09:38',
-                 'neighborhood': 'Seacliff Beach, Aptos', 'softwareType': 'WS-1002 V2.4.5', 'country': 'US',
-                 'solarRadiation': 0.0, 'lon': -121.908257, 'realtimeFrequency': None, 'epoch': 1640740178,
-                 'lat': 36.973396, 'uv': 0.0, 'winddir': 347, 'humidity': 89.0, 'qcStatus': 1,
-                 'imperial': {'temp': 47.8, 'heatIndex': 47.8, 'dewpt': 44.8, 'windChill': 45.7, 'windSpeed': 4.9,
-                              'windGust': 4.9, 'pressure': 29.5, 'precipRate': 0.0, 'precipTotal': 0.01,
-                              'elev': 115.0}}]})
-        p.start()
-        self.addCleanup(p.stop)
+        # p = mock.patch('weather.Weather.station_data_api_call', return_value={
+        #     'observations': [
+        #         {'stationID': 'KCAAPTOS92', 'obsTimeUtc': '2021-12-29T01:09:38Z', 'obsTimeLocal': '2021-12-28 17:09:38',
+        #          'neighborhood': 'Seacliff Beach, Aptos', 'softwareType': 'WS-1002 V2.4.5', 'country': 'US',
+        #          'solarRadiation': 0.0, 'lon': -121.908257, 'realtimeFrequency': None, 'epoch': 1640740178,
+        #          'lat': 36.973396, 'uv': 0.0, 'winddir': 347, 'humidity': 89.0, 'qcStatus': 1,
+        #          'imperial': {'temp': 47.8, 'heatIndex': 47.8, 'dewpt': 44.8, 'windChill': 45.7, 'windSpeed': 4.9,
+        #                       'windGust': 4.9, 'pressure': 29.5, 'precipRate': 0.0, 'precipTotal': 0.01,
+        #                       'elev': 115.0}}]})
+        # p.start()
+        # self.addCleanup(p.stop)
 
         with open("data/forecast.json") as fh:
             p = mock.patch('weather.Weather.forecast_api_call', return_value=json.load(fh))
@@ -76,6 +79,7 @@ class TestWeather(unittest.TestCase):
         self.weather = weather.Weather(lat, lon, "stationid", api_key_weather, "wundergroundapikey")
 
         self.mock_sql.connect().cursor().fetchall.return_value = [(1640740178,)]
+
     # TODO: collect station data for 5minute and hourly updates and save to databases
     # TODO: add testing for all that too
 
@@ -95,8 +99,9 @@ class TestWeather(unittest.TestCase):
                              ('INSERT INTO weather (epoch,obsTimeLocal,dewpt,heatIndex,humidity,precipRate,'
                               'precipTotal,pressure,solarRadiation,temp,uv,windChill,windGust,windSpeed,winddir) '
                               'VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);'))
-            self.assertEqual(args[1], ['1640740178', '2021-12-28 17:09:38', '44.8', '47.8', '89.0', '0.0', '0.01',
-                                       '29.5', '0.0', '47.8', '0.0', '45.7', '4.9', '4.9', '347'])
+            self.assertEqual(
+                ['1641618811', '2022-01-07 21:13:31', '48.6', '49.6', '96.0', '0.0', '0.0', '29.67', '0.0', '49.6',
+                 '0.0', '49.6', '0.0', '0.0', '318'], args[1])
         self.assertTrue(insert_found)
         self.assertEqual(("CREATE TABLE weather (epoch INTEGER, obsTimeLocal STRING , dewpt FLOAT, heatIndex FLOAT, "
                           "humidity FLOAT, precipRate FLOAT, precipTotal FLOAT, pressure FLOAT, solarRadiation FLOAT, "
@@ -107,6 +112,7 @@ class TestWeather(unittest.TestCase):
     def test_weather_api_json_bad_method_path(self):
         with self.assertRaises(ValueError):
             self.weather.weather_api_json("foo/bar")
+
 
 if __name__ == '__main__':
     unittest.main()
