@@ -46,6 +46,7 @@ class Weather:
 
         for sd in self.station_rapid_historic_data()["observations"]:
             self.update_database("rapid", sd)
+        # save the data to google sheets here hourly or daily
 
         obs = self.station_data["observations"][0]
         self.lat = obs["lat"]
