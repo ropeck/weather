@@ -28,3 +28,4 @@
 0 9 * * * /home/pi/backup-home-to-nas.sh
 0 0 * * * cd /home/pi/weather; sqlite3 weather.sqlite3 ".backup weather.bak.sqlite3"
 30 0 * * * rsync -av --delete /home/pi/weather nas:/nas
+15 * * * * /home/pi/weather/update_sheet.py
