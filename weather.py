@@ -102,7 +102,7 @@ class Weather:
 
     def station_data_api_call(self):
         return self.get_api_method_json(
-            "https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal"
+            f"https://api.weather.com/v2/pws/observations/current?stationId=KCAAPTOS92&format=json&units=e&apiKey={self.api_key_wunderground}&numericPrecision=decimal"
         )
 
     def update_database(self, table, sd):
