@@ -66,13 +66,17 @@ class Weather:
         json_dict = response.json()
         data_path = os.getenv("WEATHER_API_RESPONSE_PATH")
         if data_path:
-            url = re.sub("\?.*$", "", api_url).split("/")[2:]
-            api_url_str = re.sub("/", "_", "/".join(url))
-            pathname = f'{data_path}/{api_url_str}_{int(time.time())}.json'
+            pathname = self.api_pathname(api_url, data_path)
             with open(pathname, "w") as fh:
                 json.dump(json_dict, fh)
             print(f"logged {pathname}")
         return json_dict
+
+    def api_pathname(self, api_url, data_path):
+        url = re.sub("\?.*$", "", api_url).split("/")[2:]
+        api_url_str = re.sub("/", "_", "/".join(url))
+        pathname = f'{data_path}/{api_url_str}_{int(time.time())}.json'
+        return pathname
 
     def station_daily_historic_data(self):
         # https://docs.google.com/document/d/1OlAIqLb8kSfNV_Uz1_3je2CGqSnynV24qGHHrLWn7O8/edit

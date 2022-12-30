@@ -21,6 +21,8 @@ global been_reboot
 global debug
 debug = False
 
+UPDATE_INTERVAL = 300  # time sleeping between frame / image updates
+
 def map_resize(val, in_mini, in_maxi, out_mini, out_maxi):
     if in_maxi - in_mini != 0:
         out_temp = (val - in_mini) * (out_maxi - out_mini) // (in_maxi - in_mini) + out_mini
@@ -309,7 +311,7 @@ if __name__ == "__main__":
             news.update(api_key_news)
             print("News Updated")
             main()
-            time.sleep(3600)
+            time.sleep(UPDATE_INTERVAL)
         except KeyboardInterrupt:
             if debug ==0 :
                 epd.init()
