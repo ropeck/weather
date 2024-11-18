@@ -34,9 +34,9 @@
 
         /* Image Styles */
         .weather-image {
-            max-width: 600px;
-	    width: 100%;
-            height: auto;
+            max-width: 600px; /* Limits the image size */
+            width: 100%; /* Ensures responsiveness */
+            height: auto; /* Maintains aspect ratio */
             border: 2px solid #ddd;
             border-radius: 8px;
             margin-bottom: 1em;
@@ -77,21 +77,42 @@
     </style>
 </head>
 <body>
-    <h1>Fogcat5 Weather</h1>
-    <img src="weather.png" alt="Current weather conditions" class="weather-image">
+    <header>
+        <h1>Fogcat5 Weather</h1>
+    </header>
     
-    <div class="links">
-        <a href="https://www.wunderground.com/dashboard/pws/KCAAPTOS92" target="_blank">Wunderground Dashboard</a>
-        <a href="https://www.wunderground.com/forecast/us/ca/aptos/KCAAPTOS92" target="_blank">Forecast</a>
-        <a href="https://www.wunderground.com/wundermap?lat=36.974&lon=-121.916&zoom=8&radar=1&wxstn=0" target="_blank">Radar</a>
-        <a href="/weather/README.html" target="_blank">Local Weather Project Repo</a>
-        <a href="https://docs.google.com/spreadsheets/d/1ppl5NvhRnZVhwTHXqMmR10LjdSSB9eA3E6JJS4BZzz4/edit?usp=sharing" target="_blank">Spreadsheet History</a>
-        <a href="http://github.com/ropeck/weather" target="_blank">GitHub Weather Project Repo</a>
-        <a href="https://www.youtube.com/watch?v=hXtYKDio1rQ" target="_blank">Rio Sands Live Cam</a>
-    </div>
+    <main>
+        <!-- Weather Image -->
+        <img src="weather.png" alt="A graph showing the current weather conditions in Aptos" class="weather-image">
+        
+        <!-- Links Section -->
+        <nav class="links" aria-label="Useful weather resources">
+            <a href="https://www.wunderground.com/dashboard/pws/KCAAPTOS92" target="_blank" rel="noopener noreferrer" aria-label="Wunderground personal weather station dashboard">
+                Wunderground Dashboard
+            </a>
+            <a href="https://www.wunderground.com/forecast/us/ca/aptos/KCAAPTOS92" target="_blank" rel="noopener noreferrer" aria-label="Wunderground forecast for Aptos">
+                Forecast
+            </a>
+            <a href="https://www.wunderground.com/wundermap?lat=36.974&lon=-121.916&zoom=8&radar=1&wxstn=0" target="_blank" rel="noopener noreferrer" aria-label="Wunderground radar for Aptos area">
+                Radar
+            </a>
+            <a href="/weather/README.html" target="_blank" rel="noopener noreferrer" aria-label="Local weather project documentation">
+                Local Weather Project Repo
+            </a>
+            <a href="https://docs.google.com/spreadsheets/d/1ppl5NvhRnZVhwTHXqMmR10LjdSSB9eA3E6JJS4BZzz4/edit?usp=sharing" target="_blank" rel="noopener noreferrer" aria-label="Google Sheets document with weather history">
+                Spreadsheet History
+            </a>
+            <a href="http://github.com/ropeck/weather" target="_blank" rel="noopener noreferrer" aria-label="GitHub repository for the weather project">
+                GitHub Weather Project Repo
+            </a>
+            <a href="https://www.youtube.com/watch?v=hXtYKDio1rQ" target="_blank" rel="noopener noreferrer" aria-label="Rio Sands beach live webcam">
+                Rio Sands Live Cam
+            </a>
+        </nav>
+    </main>
     
     <footer>
-        &copy; 2024 Fogcat5 Weather Station. All rights reserved.
+        <p>&copy; 2024 Fogcat5 Weather Station. All rights reserved.</p>
     </footer>
 </body>
 </html>
