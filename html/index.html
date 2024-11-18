@@ -1,45 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Fogcat5 Weather</title>
-<style>
-    body {
-        width: 35em;
-        margin: 0 auto;
-        font-family: Tahoma, Verdana, Arial, sans-serif;
-    }
-    img {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fogcat5 Weather</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta http-equiv="refresh" content="900"> <!-- Refresh every 15 minutes -->
+    <style>
+        /* Base Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1em;
+        }
+
+        /* Header */
+        h1 {
+            font-size: 1.8em;
+            text-align: center;
+            color: #0066cc;
+            margin-bottom: 0.5em;
+        }
+
+        /* Image Styles */
+        .weather-image {
+            max-width: 600px;
 	    width: 100%;
-	    height: auto;
-	    display: block;
-    }
-</style>
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<meta http-equiv="refresh" content="900"> <!-- Refresh every 15 minutes -->
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 1em;
+        }
+
+        /* Links Container */
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Links Styling */
+        .links a {
+            text-decoration: none;
+            background-color: #0066cc;
+            color: white;
+            padding: 0.8em;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .links a:hover {
+            background-color: #004d99;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 2em;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-	<div>
-		<img src="weather.png">
-	</div>
-	<br>
-	<a href="https://www.wunderground.com/dashboard/pws/KCAAPTOS92" target="_blank">
-		wunderground
-	</a> <br>
-	<a href="https://www.wunderground.com/forecast/us/ca/aptos/KCAAPTOS92" target="_blank">forecast</a>
-	<br>
-	<a href="https://www.wunderground.com/wundermap?lat=36.974&lon=-121.916&zoom=8&radar=1&wxstn=0" target="_blank">
-		radar
-	</a> <br>
-        <a href="/weather/README.html" target=_blank>weather project repo local</a>
-	<br>
-	<a href="https://docs.google.com/spreadsheets/d/1ppl5NvhRnZVhwTHXqMmR10LjdSSB9eA3E6JJS4BZzz4/edit?usp=sharing" target=_blank>spreadsheet history</a>
-	<br>
-	<a href="http://github.com/ropeck/weather" target="_blank">github weather project repo</a> <br>
-	<a href="https://www.youtube.com/watch?v=hXtYKDio1rQ" target="_blank">Rio Sands Live Cam</a> <br>
-
+    <h1>Fogcat5 Weather</h1>
+    <img src="weather.png" alt="Current weather conditions" class="weather-image">
+    
+    <div class="links">
+        <a href="https://www.wunderground.com/dashboard/pws/KCAAPTOS92" target="_blank">Wunderground Dashboard</a>
+        <a href="https://www.wunderground.com/forecast/us/ca/aptos/KCAAPTOS92" target="_blank">Forecast</a>
+        <a href="https://www.wunderground.com/wundermap?lat=36.974&lon=-121.916&zoom=8&radar=1&wxstn=0" target="_blank">Radar</a>
+        <a href="/weather/README.html" target="_blank">Local Weather Project Repo</a>
+        <a href="https://docs.google.com/spreadsheets/d/1ppl5NvhRnZVhwTHXqMmR10LjdSSB9eA3E6JJS4BZzz4/edit?usp=sharing" target="_blank">Spreadsheet History</a>
+        <a href="http://github.com/ropeck/weather" target="_blank">GitHub Weather Project Repo</a>
+        <a href="https://www.youtube.com/watch?v=hXtYKDio1rQ" target="_blank">Rio Sands Live Cam</a>
+    </div>
+    
+    <footer>
+        &copy; 2024 Fogcat5 Weather Station. All rights reserved.
+    </footer>
 </body>
 </html>
