@@ -9,7 +9,7 @@ spec:
   tls:
   - hosts:
     - info.fogcat5.com
-    secretName: info-tls
+    secretName: weather-tls
   rules:
   - host: info.fogcat5.com
     http:
