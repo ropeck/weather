@@ -4,7 +4,7 @@ RUN echo "deb http://deb.debian.org/debian bookworm contrib non-free" > /etc/apt
 RUN apt update && apt install -y ttf-mscorefonts-installer
 RUN apt install -y nginx sqlite3 fonts-dejavu-core 
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/sites-available/default
 COPY html /usr/share/nginx/html
 COPY romeo.png /home/pi/weather/weather.png 
 COPY romeo.png /usr/share/nginx/weather.png 
