@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: weather
+  template:
+    metadata:
+      labels:
+        app: weather
+    spec:
+      containers:
+      - name: weather
+        image: fogcat5/weather:latest
+        ports:
+        - containerPort: 8080
