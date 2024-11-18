@@ -8,16 +8,16 @@ metadata:
 spec:
   tls:
   - hosts:
-    - weather.fogcat5.com
-    secretName: weather-tls
+    - info.fogcat5.com
+    secretName: info-tls
   rules:
-  - host: weather.fogcat5.com
+  - host: info.fogcat5.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: weather-service
+            name: info-service
             port:
               number: 80
