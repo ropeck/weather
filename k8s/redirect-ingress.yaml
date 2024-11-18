@@ -3,9 +3,14 @@ kind: Ingress
 metadata:
   name: redirect-ingress
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
     nginx.ingress.kubernetes.io/permanent-redirect: https://weather.fogcat5.com
 spec:
   ingressClassName: nginx
+  tls:
+  - hosts:
+    - fogcat5.com
+    secretName: fogcat5-tls  # A new secret for this domain
   rules:
   - host: fogcat5.com
     http:
