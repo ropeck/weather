@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redirect-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/permanent-redirect: https://weather.fogcat5.com
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: fogcat5.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dummy-service
+            port:
+              number: 80

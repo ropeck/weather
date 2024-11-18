@@ -3,15 +3,16 @@ kind: Ingress
 metadata:
   name: weather-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
     cert-manager.io/cluster-issuer: "letsencrypt"
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: nginx
   tls:
   - hosts:
-    - info.fogcat5.com
+    - weather.fogcat5.com
     secretName: weather-tls
   rules:
-  - host: info.fogcat5.com
+  - host: weather.fogcat5.com
     http:
       paths:
       - path: /
