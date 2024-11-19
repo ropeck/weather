@@ -8,6 +8,11 @@ COPY nginx.conf /etc/nginx/sites-available/default
 COPY html /usr/share/nginx/html
 COPY romeo.png /home/pi/weather/weather.png 
 COPY romeo.png /usr/share/nginx/weather.png 
+
+# big hack to make the legacy links work
+# this copies way more than we really want
+COPY . /usr/share/nginx/html/weather
+
 COPY . /app
 WORKDIR /app
 

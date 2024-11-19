@@ -12,7 +12,7 @@
 from display import *
 from news import *
 from weather import *
-import epd5in65f
+# import epd5in65f
 import json
 import traceback
 
@@ -20,6 +20,7 @@ import traceback
 global been_reboot
 global debug
 debug = False
+image_only = False
 
 UPDATE_INTERVAL = 300  # time sleeping between frame / image updates
 
@@ -245,6 +246,8 @@ def main():
 
     try:
         display.im_black.save("weather.png")
+        if image_only:
+            return True
         print("\tClearing Screen...")
         if not debug:
             # display.im_black.show()
@@ -272,8 +275,14 @@ def main():
 if __name__ == "__main__":
     been_reboot = True
 
-    epd = epd5in65f.EPD()
+    try:
+        epd = epd5in65f.EPD()
+    except NameError:
+        print("EPD is not available")
+        edp = None
+
     debug = os.getenv("WEATHER_DEBUG")
+    image_only = os.getenv("WEATHER_IMAGE_ONLY")
 
     lat = os.getenv("WEATHER_LAT")
     lon = os.getenv("WEATHER_LONG")
@@ -311,6 +320,9 @@ if __name__ == "__main__":
             news.update(api_key_news)
             print("News Updated")
             main()
+            if image_only:
+                print("Image Updated, exiting")
+                exit()
             time.sleep(UPDATE_INTERVAL)
         except KeyboardInterrupt:
             if debug ==0 :
