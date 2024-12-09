@@ -4,7 +4,7 @@ metadata:
   name: weather-ingress
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"  # Redirect HTTP to HTTPS
 spec:
   ingressClassName: nginx
@@ -23,28 +23,28 @@ spec:
             name: weather-service
             port:
               number: 80
-      - path: /frames(/|$)(.*)
+      - path: /(frames.*)
         pathType: ImplementationSpecific
         backend:
           service:
             name: timelapse-web
             port:
               number: 5000
-      - path: /gif(/|$)(.*)
+      - path: /(gif.*)
         pathType: ImplementationSpecific
         backend:
           service:
             name: timelapse-web
             port:
               number: 5000
-      - path: /timelapse(/|$)(.*)
+      - path: /(timelapse.*)
         pathType: ImplementationSpecific
         backend:
           service:
             name: timelapse-web
             port:
               number: 5000
-      - path: /thumbnails(/|$)(.*)
+      - path: /(thumbnails.*)
         pathType: ImplementationSpecific
         backend:
           service:
