@@ -17,3 +17,15 @@ spec:
         image: fogcat5/weather:latest
         ports:
         - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /healthz  # The endpoint your app exposes for health checks
+            port: 8080
+          initialDelaySeconds: 5  # Wait 5 seconds after the container starts before checking
+          periodSeconds: 10       # Check every 10 seconds
+        livenessProbe:
+          httpGet:
+            path: /healthz  # The endpoint your app exposes for liveness checks
+            port: 8080
+          initialDelaySeconds: 10  # Wait 10 seconds after the container starts before the first check
+          periodSeconds: 30        # Check every 30 seconds
