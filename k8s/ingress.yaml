@@ -16,6 +16,13 @@ spec:
   - host: weather.fogcat5.com
     http:
       paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: weather-service
+            port:
+              number: 80
       - path: /frames(/|$)(.*)
         pathType: ImplementationSpecific
         backend:
