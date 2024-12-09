@@ -23,3 +23,31 @@ spec:
             name: weather-service
             port:
               number: 80
+      - path: /timelapse
+        pathType: Prefix
+        backend:
+          service:
+            name: timelapse-web
+            port:
+              number: 5000
+      - path: /gif
+        pathType: Prefix
+        backend:
+          service:
+            name: timelapse-web
+            port:
+              number: 5000
+      - path: /frames
+        pathType: Prefix
+        backend:
+          service:
+            name: timelapse-web
+            port:
+              number: 5000
+      - path: /thumbnails
+        pathType: Prefix
+        backend:
+          service:
+            name: timelapse-web
+            port:
+              number: 5000
