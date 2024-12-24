@@ -51,3 +51,10 @@ spec:
             name: timelapse-web
             port:
               number: 5000
+      - path: /weather.png
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: weather-service
+            port:
+              number: 80
