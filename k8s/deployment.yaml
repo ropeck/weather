@@ -15,6 +15,7 @@ spec:
       containers:
       - name: weather
         image: fogcat5/weather:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         readinessProbe:
