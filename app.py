@@ -1,4 +1,5 @@
 from flask import Flask, render_template, Response, send_from_directory
+from cachetools import cached, TTLCache
 from google.cloud import storage
 import os
 
@@ -24,18 +25,24 @@ def index():
     return render_template('index.html', videos=videos)
 
 
+@cached(cache=TTLCache(maxsize=100, ttl=600))
+def get_video_list():
+    # Access the GCS bucket
+    bucket = storage_client.get_bucket(BUCKET_NAME)
+
+    # Get all blobs in the bucket and sort by updated timestamp (most recent first)
+    blobs = [x for x in list(bucket.list_blobs()) if "frames" not in x.name]
+    if not blobs:
+        return "No videos found in the bucket.", 404
+
+    print(f"Found {len(blobs)} videos.")
+    return blobs
+
+
 @app.route('/video_latest')
 def video_latest():
     try:
-        # Access the GCS bucket
-        bucket = storage_client.get_bucket(BUCKET_NAME)
-
-        # Get all blobs in the bucket and sort by updated timestamp (most recent first)
-        blobs = [x for x in list(bucket.list_blobs()) if "frames" not in x.name]
-        if not blobs:
-            return "No videos found in the bucket.", 404
-
-        print(f"Found {len(blobs)} videos.")
+        blobs = get_video_list()
         most_recent_blob = max(blobs, key=lambda b: b.updated)
         print(f"Most recent blob: {most_recent_blob.name}")
         # Stream the blob content as bytes
