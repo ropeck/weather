@@ -9,7 +9,7 @@
     <h1>Camera Collector Videos</h1>
     <ul>
         {% for video in videos %}
-        <li><a href="{{ video.url }}">{{ video.name }}</a></li>
+        <li><a href="/video/{{ video.name }}">{{ video.name }}</a></li>
         {% endfor %}
     </ul>
 </body>

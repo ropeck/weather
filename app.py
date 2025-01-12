@@ -6,7 +6,6 @@ import os
 app = Flask(__name__)
 storage_client = storage.Client()
 BUCKET_NAME = os.environ.get('BUCKET_NAME', "fogcat-webcam")
-@app.route('/')
 
 
 @app.route('/favicon.ico')
@@ -17,13 +16,18 @@ def favicon():
         mimetype='image/vnd.microsoft.icon'
     )
 
+
+@app.route('/')
 def index():
     # Replace with actual GCS logic
-    videos = [
-        {"name": "sample_video.mp4", "url": "/static/sample_video.mp4"}
-    ]
+    videos = get_video_list()
     return render_template('index.html', videos=videos)
 
+@app.route('/video/<path:subpath>')
+def video(subpath):
+    print(subpath)
+    blob = storage_client.bucket(BUCKET_NAME).blob(subpath)
+    return send_video(blob)
 
 @cached(cache=TTLCache(maxsize=100, ttl=600))
 def get_video_list():
@@ -45,19 +49,24 @@ def video_latest():
         blobs = get_video_list()
         most_recent_blob = max(blobs, key=lambda b: b.updated)
         print(f"Most recent blob: {most_recent_blob.name}")
-        # Stream the blob content as bytes
-        def generate():
-            with most_recent_blob.open("rb") as blob_stream:
-                while True:
-                    chunk = blob_stream.read(1024 * 1024)  # Read in 1 MB chunks
-                    if not chunk:
-                        break
-                    yield chunk
-
-        return Response(generate(), content_type="video/mp4")
+        return send_video(most_recent_blob)
 
     except Exception as e:
         return f"An error occurred: {e}", 500
+
+
+def send_video(blob):
+    # Stream the blob content as bytes
+    def generate():
+        with blob.open("rb") as blob_stream:
+            while True:
+                chunk = blob_stream.read(1024 * 1024)  # Read in 1 MB chunks
+                if not chunk:
+                    break
+                yield chunk
+
+    return Response(generate(), content_type="video/mp4")
+
 
 @app.route('/latest')
 def latest():
