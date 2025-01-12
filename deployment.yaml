@@ -19,6 +19,14 @@ spec:
         image: fogcat5/camera-collector-webapp:latest
         ports:
         - containerPort: 5000
+        volumeMounts:
+        - name: gcp-credentials
+          mountPath: /app/service-account-key.json
+          subPath: service-account-key.json
         env:
         - name: FLASK_ENV
           value: "production"
+      volumes:
+      - name: gcp-credentials
+        secret:
+          secretName: gcp-credentials
