@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, send_from_directory
 from google.cloud import storage
 import os
 
@@ -6,6 +6,16 @@ app = Flask(__name__)
 storage_client = storage.Client()
 BUCKET_NAME = os.environ.get('BUCKET_NAME', "fogcat-webcam")
 @app.route('/')
+
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, 'static'),
+        'favicon.ico',
+        mimetype='image/vnd.microsoft.icon'
+    )
+
 def index():
     # Replace with actual GCS logic
     videos = [
