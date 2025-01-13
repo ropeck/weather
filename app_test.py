@@ -47,17 +47,33 @@ class AppTestCase(unittest.TestCase):
     @patch('app.get_video_list')
     @patch('app.send_video')
     def test_video_latest(self, mock_send_video, mock_get_video_list):
-        # Mock get_video_list and send_video
-        mock_blob = MagicMock()
-        mock_blob.updated = 123456789
-        mock_blob.name = "test_video.mp4"
-        mock_get_video_list.return_value = [mock_blob]
+        # Mock multiple blobs with different update times
+        mock_blob_old = MagicMock()
+        mock_blob_old.updated = 1000
+        mock_blob_old.name = "old_video.mp4"
+
+        mock_blob_newer = MagicMock()
+        mock_blob_newer.updated = 2000
+        mock_blob_newer.name = "newer_video.mp4"
+
+        mock_blob_latest = MagicMock()
+        mock_blob_latest.updated = 3000
+        mock_blob_latest.name = "latest_video.mp4"
+
+        # Return these blobs as the mock for get_video_list
+        mock_get_video_list.return_value = [mock_blob_old, mock_blob_newer, mock_blob_latest]
+
+        # Mock send_video's response
         mock_send_video.return_value = "Video Streamed"
 
+        # Call the route
         response = self.client.get('/video_latest')
+
+        # Assertions
         mock_get_video_list.assert_called_once()
-        mock_send_video.assert_called_once_with(mock_blob)
+        mock_send_video.assert_called_once_with(mock_blob_latest)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.decode(), "Video Streamed")
 
     @patch('app.render_template')
     def test_latest(self, mock_render_template):
