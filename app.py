@@ -47,18 +47,19 @@ def get_video_list() -> List[storage.Blob]:
 
 
 @app.route('/video_latest')
-def video_latest() -> Union[Response, Tuple[str, int]]:
+def video_latest() -> Response:
     try:
         blobs = get_video_list()
-        if isinstance(blobs, tuple):  # Handle case where no videos are found
-            return blobs
-
         most_recent_blob = max(blobs, key=lambda b: b.updated)
         print(f"Most recent blob: {most_recent_blob.name}")
         return send_video(most_recent_blob)
 
-    except Exception as e:
-        return f"An error occurred: {e}", 500
+    except ValueError as e:  # Handle no videos found
+        return jsonify({"error": str(e)}), 404
+
+    except Exception as e:  # Handle other unexpected errors
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
 
 
 def send_video(blob: storage.Blob) -> Response:
