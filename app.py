@@ -85,7 +85,7 @@ def send_video(blob: storage.Blob) -> Response:
 @app.route('/latest')
 def latest() -> str:
     # Embed the video player with autoloop in the HTML
-    return render_template("latest.html", video_url="/video_latest")
+    return render_template("latest.html", video_url="video_latest")
 
 
 if __name__ == '__main__':
