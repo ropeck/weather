@@ -1,3 +1,5 @@
+#!/usr/local/bin/python
+
 from flask import Flask, render_template, Response, send_from_directory, jsonify
 from cachetools import cached, TTLCache
 from google.cloud import storage
@@ -16,6 +18,11 @@ def favicon() -> Response:
         'favicon.ico',
         mimetype='image/vnd.microsoft.icon'
     )
+
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "ok"}), 200
 
 
 @app.route('/')
