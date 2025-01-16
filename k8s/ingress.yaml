@@ -66,4 +66,3 @@ spec:
             name: camera-webapp-service
             port:
               number: 80
-
