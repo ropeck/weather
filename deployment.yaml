@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: camera-collector-webapp
+  name: collector-webapp
   labels:
-    app: camera-collector-webapp
+    app: collector-webapp
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: camera-collector-webapp
+      app: collector-webapp
   template:
     metadata:
       labels:
-        app: camera-collector-webapp
+        app: collector-webapp
     spec:
       containers:
-      - name: camera-collector-webapp
-        image: fogcat5/camera-collector-webapp:latest
+      - name: collector-webapp
+        image: fogcat5/collector-webapp:latest
         ports:
         - containerPort: 5000
         volumeMounts:
