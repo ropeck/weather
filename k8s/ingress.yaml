@@ -25,13 +25,6 @@ spec:
             name: collector-webapp-service
             port:
               number: 80
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: weather-service
-            port:
-              number: 80
       - path: /(frames.*)
         pathType: ImplementationSpecific
         backend:
@@ -62,6 +55,13 @@ spec:
               number: 5000
       - path: /weather.png
         pathType: ImplementationSpecific
+        backend:
+          service:
+            name: weather-service
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
         backend:
           service:
             name: weather-service
