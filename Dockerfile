@@ -44,7 +44,8 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 
 USER root
 # Copy the rest of the application files
-COPY app.py endpoint.sh templates static /app
+COPY . /app
+
 RUN chown -R appuser:appuser /app
 RUN chmod +x /app/*.sh /app/*.py
 
