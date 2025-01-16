@@ -18,8 +18,9 @@ spec:
   - host: weather.fogcat5.com
     http:
       paths:
-      - path: /collector/(.*)
-        pathType: ImplementationSpecific
+#      - path: /collector/(.*)
+      - path: /collector
+#        pathType: ImplementationSpecific
         backend:
           service:
             name: collector-webapp-service
