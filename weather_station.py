@@ -337,4 +337,5 @@ if __name__ == "__main__":
             current_time = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
             print("PROBLEM OCCURRED WHILE REFRESHING - NEXT TRY 1000s - @" + current_time)
             print(str(e))
+            print(traceback.format_exc())
             time.sleep(1000)

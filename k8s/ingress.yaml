@@ -59,3 +59,11 @@ spec:
             name: weather-service
             port:
               number: 80
+      - path: /collector/(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: camera-webapp-service
+            port:
+              number: 80
+
