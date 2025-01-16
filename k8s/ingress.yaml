@@ -63,6 +63,6 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: camera-webapp-service
+            name: collector-webapp-service
             port:
               number: 80
