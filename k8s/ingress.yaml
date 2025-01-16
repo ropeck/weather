@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: weather-ingress
   annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
     cert-manager.io/cluster-issuer: "letsencrypt"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"  # Redirect HTTP to HTTPS
     nginx.ingress.kubernetes.io/custom-http-errors: "404"   # Trigger custom handling for 404 errors
@@ -17,6 +18,13 @@ spec:
   - host: weather.fogcat5.com
     http:
       paths:
+      - path: /collector/(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: collector-webapp-service
+            port:
+              number: 80
       - path: /
         pathType: Prefix
         backend:
@@ -57,12 +65,5 @@ spec:
         backend:
           service:
             name: weather-service
-            port:
-              number: 80
-      - path: /collector/(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: collector-webapp-service
             port:
               number: 80
