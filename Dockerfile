@@ -34,7 +34,6 @@ RUN curl https://sdk.cloud.google.com | bash && \
     echo "installed"
 ENV PATH="$PATH:/home/appuser/google-cloud-sdk/bin"
 
-
 # Expose the port the app runs on
 EXPOSE 5000
 
