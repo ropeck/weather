@@ -13,6 +13,7 @@ spec:
   tls:
   - hosts:
     - weather.fogcat5.com
+    - api.fogcat5.com
     secretName: weather-tls
   rules:
   - host: weather.fogcat5.com
@@ -65,5 +66,15 @@ spec:
         backend:
           service:
             name: weather-service
+            port:
+              number: 80
+  - host: api.fogcat5.com
+    http:
+      paths:
+      - path: /(.*)
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: camera-collector-service
             port:
               number: 80
