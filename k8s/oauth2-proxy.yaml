@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth2-proxy
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        app: oauth2-proxy
+    spec:
+      containers:
+      - name: oauth2-proxy
+        image: quay.io/oauth2-proxy/oauth2-proxy:v7.4.0
+        args:
+          - --provider=google
+          - --client-id=$(CLIENT_ID)
+          - --client-secret=$(CLIENT_SECRET)
+          - --cookie-secret=$(COOKIE_SECRET)
+          - --redirect-url=https://api.fogcat5.com/oauth2/callback
+          - --upstream=http://camera-collector-service:80
+        env:
+        - name: CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: oauth2-proxy-secrets
+              key: client-id
+        - name: CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: oauth2-proxy-secrets
+              key: client-secret
+        - name: COOKIE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: oauth2-proxy-secrets
+              key: cookie-secret
+        ports:
+        - containerPort: 4180

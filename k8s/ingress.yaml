@@ -1,80 +1,84 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: weather-ingress
+  name: combined-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /$1
     cert-manager.io/cluster-issuer: "letsencrypt"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"  # Redirect HTTP to HTTPS
     nginx.ingress.kubernetes.io/custom-http-errors: "404"   # Trigger custom handling for 404 errors
     nginx.ingress.kubernetes.io/error-page: "/404.html"      # Custom error page to redirect
+    nginx.ingress.kubernetes.io/auth-url: "https://api.fogcat5.com/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://api.fogcat5.com/oauth2/start?rd=$request_uri"
+    nginx.ingress.kubernetes.io/auth-response-headers: "Authorization, X-Auth-Userinfo"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      auth_request_set $auth_status $upstream_status;
+      if ($auth_status = 401) {
+        return 302 https://api.fogcat5.com/oauth2/start?rd=$request_uri;
+      }
 spec:
   ingressClassName: nginx
   tls:
-  - hosts:
-    - weather.fogcat5.com
-    - api.fogcat5.com
-    secretName: weather-tls
+    - hosts:
+        - weather.fogcat5.com
+        - api.fogcat5.com
+      secretName: weather-tls
   rules:
-  - host: weather.fogcat5.com
-    http:
-      paths:
-      - path: /collector/(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: collector-webapp-service
-            port:
-              number: 80
-      - path: /(frames.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: timelapse-web
-            port:
-              number: 5000
-      - path: /(gif.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: timelapse-web
-            port:
-              number: 5000
-      - path: /(timelapse.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: timelapse-web
-            port:
-              number: 5000
-      - path: /(thumbnails.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: timelapse-web
-            port:
-              number: 5000
-#      - path: /weather.png
-#        pathType: ImplementationSpecific
-#        backend:
-#          service:
-#            name: weather-service
-#            port:
-#              number: 80
-      - path: /(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: weather-service
-            port:
-              number: 80
-  - host: api.fogcat5.com
-    http:
-      paths:
-      - path: /(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: camera-collector-service
-            port:
-              number: 80
+    # Rules for weather.fogcat5.com
+    - host: weather.fogcat5.com
+      http:
+        paths:
+          - path: /collector/(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: collector-webapp-service
+                port:
+                  number: 80
+          - path: /(frames.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: timelapse-web
+                port:
+                  number: 5000
+          - path: /(gif.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: timelapse-web
+                port:
+                  number: 5000
+          - path: /(timelapse.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: timelapse-web
+                port:
+                  number: 5000
+          - path: /(thumbnails.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: timelapse-web
+                port:
+                  number: 5000
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: weather-service
+                port:
+                  number: 80
+
+    # Rules for api.fogcat5.com with OAuth2 Proxy
+    - host: api.fogcat5.com
+      http:
+        paths:
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: oauth2-proxy
+                port:
+                  number: 4180
