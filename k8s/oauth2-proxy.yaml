@@ -21,6 +21,7 @@ spec:
           - --client-id=$(CLIENT_ID)
           - --client-secret=$(CLIENT_SECRET)
           - --cookie-secret=$(COOKIE_SECRET)
+          - --email-domain=*
           - --redirect-url=https://api.fogcat5.com/oauth2/callback
           - --upstream=http://camera-collector-service:80
         env:
