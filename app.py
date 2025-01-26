@@ -76,6 +76,7 @@ def send_video(blob: storage.Blob) -> Response:
             "-movflags", "+faststart",
             "-y", output_path
         ]
+        logging.debug(f"command {command}")
 
         process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if process.returncode != 0:
