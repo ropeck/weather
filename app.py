@@ -64,12 +64,17 @@ def send_video(blob: storage.Blob) -> Response:
 
         title_text = blob_creation_time.replace(":", "\:").replace("'", "\'")
         font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+        if not os.path.exists(font_path):
+            raise FileNotFoundError(f"Font file not found at {font_path}. Please install the required font.")
+
+        creation_time_formatted = datetime.strptime(blob_creation_time, "%Y-%m-%d %H:%M:%S").astimezone().strftime(
+            "%I:%M %p %Z")
 
         logging.info(f"Processing video {input_path} with FFmpeg to add title...")
         command = [
             "ffmpeg",
             "-i", input_path,
-            "-vf", f"drawtext=text=\"{title_text}\":fontfile={font_path}:fontsize=24:fontcolor=white:x=(w-text_w)/2:y=30",
+            "-vf", f"drawtext=text=\"{title_text}\":fontfile={font_path}:fontsize=24:fontcolor=white:x=10:y=10,drawtext=text=\"fogcat5\":fontfile={font_path}:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
             "-c:v", "libx264",
             "-c:a", "aac",
             "-movflags", "+faststart",
