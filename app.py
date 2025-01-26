@@ -61,7 +61,7 @@ def send_video(blob: storage.Blob) -> Response:
     def generate():
         # Properly format the text arguments
         creation_time_formatted = blob.time_created.strftime("%I:%M %p %Z")
-        title_text = creation_time_formatted
+        title_text = f"Created at {creation_time_formatted}"
         watermark_text = "fogcat5"
 
         # Use a pipe to stream data between FFmpeg and the HTTP response
@@ -99,52 +99,30 @@ def send_video(blob: storage.Blob) -> Response:
         finally:
             process.terminate()
             process.wait()
-        # Use a pipe to stream data between FFmpeg and the HTTP response
-        process = subprocess.Popen(
-            [
-                "ffmpeg",
-                "-i", "pipe:0",  # Input from stdin
-                "-vf", f"drawtext=text='Created at {blob.time_created.strftime('%I:%M %p %Z')}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10,"
-                       f"drawtext=text='fogcat5':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
-                "-c:v", "libx264",
-                "-c:a", "aac",
-                "-movflags", "+faststart",
-                "-f", "mp4",
-                "pipe:1"  # Output to stdout
-            ],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            bufsize=10**6
-        )
-
-        try:
-            # Stream the blob content into FFmpeg
-            with blob.open("rb") as blob_stream:
-                while chunk := blob_stream.read(1024 * 1024):  # Read in chunks
-                    process.stdin.write(chunk)
-                process.stdin.close()
-
-            # Stream FFmpeg's output to the HTTP response
-            for chunk in iter(lambda: process.stdout.read(1024 * 1024), b""):
-                yield chunk
-        except Exception as e:
-            logging.error(f"Error streaming video: {e}")
-        finally:
-            process.terminate()
-            process.wait()
 
     return Response(generate(), content_type="video/mp4")
 
 
 @app.route('/video_latest')
 def video_latest() -> Response:
-    return send_video(latest_blob())
+    try:
+        blob = latest_blob()
+        return send_video(blob)
+    except ValueError as e:
+        logging.error(f"Error fetching latest video: {e}")
+        return Response(f"Error: {str(e)}", status=404)
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
+        return Response(f"Error: {str(e)}", status=500)
 
 
 def latest_blob() -> storage.Blob:
     blobs = get_video_list()
-    return max(blobs, key=lambda b: b.updated)
+    if not blobs:
+        raise ValueError("No blobs found in the bucket.")
+    latest = max(blobs, key=lambda b: b.updated)
+    logging.info(f"Latest blob: {latest.name}, size: {latest.size}, created at: {latest.time_created}")
+    return latest
 
 
 @app.route('/latest')
