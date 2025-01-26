@@ -55,15 +55,14 @@ def get_video_list() -> List[storage.Blob]:
 
 
 def send_video(blob: storage.Blob) -> Response:
-    def process_video_with_ffmpeg(input_path: str, output_path: str):
+    def process_video_with_ffmpeg(input_path: str, output_path: str, blob_creation_time: str):
         """
         Processes the video using FFmpeg to add a title with the current date and time.
         """
         if not os.path.exists(input_path):
             raise FileNotFoundError(f"Input file {input_path} does not exist.")
 
-        blob_creation_time = blob.time_created.strftime("%Y-%m-%d %H:%M:%S")
-        title_text = blob_creation_time
+        title_text = blob_creation_time.replace(":", "\:").replace("'", "\'")
         font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
         logging.info(f"Processing video {input_path} with FFmpeg to add title...")
@@ -76,7 +75,6 @@ def send_video(blob: storage.Blob) -> Response:
             "-movflags", "+faststart",
             "-y", output_path
         ]
-        logging.debug(f"command {command}")
 
         process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if process.returncode != 0:
@@ -89,7 +87,7 @@ def send_video(blob: storage.Blob) -> Response:
     processed_path = f"/tmp/processed_{blob.name.replace('/', '_')}"
     try:
         blob.download_to_filename(local_path)
-        process_video_with_ffmpeg(local_path, processed_path)
+        process_video_with_ffmpeg(local_path, processed_path, blob.time_created.strftime("%Y-%m-%d %H:%M:%S"))
         with open(processed_path, "rb") as video_file:
             return Response(video_file.read(), content_type="video/mp4")
     finally:
