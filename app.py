@@ -69,7 +69,7 @@ def send_video(blob: storage.Blob) -> Response:
         command = [
             "ffmpeg",
             "-i", input_path,
-            "-vf", f"drawtext=text='{title_text}':fontfile={font_path}:fontsize=24:fontcolor=white:x=(w-text_w)/2:y=30",
+            "-vf", f"drawtext=text=\"{title_text}\":fontfile={font_path}:fontsize=24:fontcolor=white:x=(w-text_w)/2:y=30",
             "-c:v", "libx264",
             "-c:a", "aac",
             "-movflags", "+faststart",
