@@ -3,6 +3,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 from app import app, get_video_list, send_video, BUCKET_NAME
 
+
 class AppTestCase(unittest.TestCase):
     def setUp(self):
         # Set up the test client
@@ -35,6 +36,8 @@ class AppTestCase(unittest.TestCase):
     def test_video(self, mock_bucket):
         # Mock bucket and blob
         mock_blob = MagicMock()
+        mock_blob.time_created = MagicMock()
+        mock_blob.time_created.strftime.return_value = "2025-01-01 12:00:00"
         mock_blob.open.return_value.read.side_effect = [b"chunk1", b"chunk2", b""]
         mock_bucket.return_value.blob.return_value = mock_blob
 
@@ -80,7 +83,7 @@ class AppTestCase(unittest.TestCase):
         # Mock render_template
         mock_render_template.return_value = "Rendered Template"
         response = self.client.get('/latest')
-        mock_render_template.assert_called_once_with("latest.html", video_url="/video_latest")
+        mock_render_template.assert_called_once_with("latest.html", video_url="video_latest")
         self.assertEqual(response.status_code, 200)
 
     @patch('app.storage_client.get_bucket')
@@ -94,6 +97,7 @@ class AppTestCase(unittest.TestCase):
         mock_get_bucket.assert_called_once_with(BUCKET_NAME)
         self.assertEqual(len(videos), 1)
         self.assertEqual(videos[0].name, "video.mp4")
+
 
 if __name__ == '__main__':
     unittest.main()
