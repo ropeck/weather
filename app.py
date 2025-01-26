@@ -3,12 +3,18 @@
 from flask import Flask, render_template, Response, send_from_directory, jsonify
 from cachetools import cached, TTLCache
 from google.cloud import storage
-from typing import List, Dict, Tuple, Union
+from typing import List
 import os
+import logging
+import subprocess
+from datetime import datetime
 
 app = Flask(__name__)
 storage_client: storage.Client = storage.Client()
 BUCKET_NAME: str = os.environ.get('BUCKET_NAME', "fogcat-webcam")
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 
 @app.route('/favicon.ico')
@@ -34,7 +40,6 @@ def index() -> str:
 
 @app.route('/video/<path:subpath>')
 def video(subpath: str) -> Response:
-    print(subpath)
     blob = storage_client.bucket(BUCKET_NAME).blob(subpath)
     return send_video(blob)
 
@@ -43,28 +48,54 @@ def video(subpath: str) -> Response:
 def get_video_list() -> List[storage.Blob]:
     # Access the GCS bucket
     bucket = storage_client.get_bucket(BUCKET_NAME)
-
-    # Get all blobs in the bucket and filter out "frames"
     blobs: List[storage.Blob] = [x for x in list(bucket.list_blobs()) if "frames" not in x.name]
     if not blobs:
-        raise ValueError("No videos found in the bucket.")  # Raise an exception for an error
-
-    print(f"Found {len(blobs)} videos.")
+        raise ValueError("No videos found in the bucket.")
     return blobs
 
 
-def latest_blob() -> storage.Blob:
+def send_video(blob: storage.Blob) -> Response:
+    def process_video_with_ffmpeg(input_path: str, output_path: str):
+        """
+        Processes the video using FFmpeg to add a title with the current date and time.
+        """
+        if not os.path.exists(input_path):
+            raise FileNotFoundError(f"Input file {input_path} does not exist.")
+
+        blob_creation_time = blob.time_created.strftime("%Y-%m-%d %H:%M:%S")
+        title_text = blob_creation_time
+        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+
+        logging.info(f"Processing video {input_path} with FFmpeg to add title...")
+        command = [
+            "ffmpeg",
+            "-i", input_path,
+            "-vf", f"drawtext=text='{title_text}':fontfile={font_path}:fontsize=24:fontcolor=white:x=(w-text_w)/2:y=30",
+            "-c:v", "libx264",
+            "-c:a", "aac",
+            "-movflags", "+faststart",
+            "-y", output_path
+        ]
+
+        process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if process.returncode != 0:
+            logging.error(f"FFmpeg processing failed: {process.stderr.decode()}")
+            raise RuntimeError(f"FFmpeg processing failed: {process.stderr.decode()}")
+
+        logging.info(f"Video processed successfully: {output_path}")
+
+    local_path = f"/tmp/{blob.name.replace('/', '_')}"
+    processed_path = f"/tmp/processed_{blob.name.replace('/', '_')}"
     try:
-        blobs = get_video_list()
-        most_recent_blob = max(blobs, key=lambda b: b.updated)
-        print(f"Most recent blob: {most_recent_blob.name}")
-        return most_recent_blob
-
-    except ValueError as e:  # Handle no videos found
-        return jsonify({"error": str(e)}), 404
-
-    except Exception as e:  # Handle other unexpected errors
-        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+        blob.download_to_filename(local_path)
+        process_video_with_ffmpeg(local_path, processed_path)
+        with open(processed_path, "rb") as video_file:
+            return Response(video_file.read(), content_type="video/mp4")
+    finally:
+        if os.path.exists(local_path):
+            os.remove(local_path)
+        if os.path.exists(processed_path):
+            os.remove(processed_path)
 
 
 @app.route('/video_latest')
@@ -72,22 +103,13 @@ def video_latest() -> Response:
     return send_video(latest_blob())
 
 
-def send_video(blob: storage.Blob) -> Response:
-    # Stream the blob content as bytes
-    def generate() -> bytes:
-        with blob.open("rb") as blob_stream:
-            while True:
-                chunk = blob_stream.read(1024 * 1024)  # Read in 1 MB chunks
-                if not chunk:
-                    break
-                yield chunk
-
-    return Response(generate(), content_type="video/mp4")
+def latest_blob() -> storage.Blob:
+    blobs = get_video_list()
+    return max(blobs, key=lambda b: b.updated)
 
 
 @app.route('/latest')
 def latest() -> str:
-    # Embed the video player with autoloop in the HTML
     return render_template("latest.html",
                            video_url="video_latest",
                            latest_blob=str(latest_blob()))
