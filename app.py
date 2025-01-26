@@ -40,7 +40,7 @@ def index() -> str:
 
 @app.route('/video/<path:subpath>')
 def video(subpath: str) -> Response:
-    blob = storage_client.bucket(BUCKET_NAME).blob(subpath)
+    blob = storage_client.bucket(BUCKET_NAME).get_blob(subpath)
     return send_video(blob)
 
 
@@ -56,51 +56,51 @@ def get_video_list() -> List[storage.Blob]:
 
 def send_video(blob: storage.Blob) -> Response:
     """
-    Streams the video from GCS with FFmpeg processing applied in real-time.
+    Downloads the blob to local disk, processes it with FFmpeg, and serves the processed file.
     """
-    def generate():
+    local_path = f"/tmp/{blob.name.replace('/', '_')}"
+    processed_path = f"/tmp/processed_{blob.name.replace('/', '_')}"
+    try:
+        # Download blob to local file
+        blob.download_to_filename(local_path)
+
         # Properly format the text arguments
-        creation_time_formatted = blob.time_created.strftime("%I:%M %p %Z")
-        title_text = f"Created at {creation_time_formatted}"
+        from pytz import timezone
+        pst = timezone('America/Los_Angeles')
+        logging.info(str(blob.__dict__))
+        logging.info(blob.updated)
+        creation_time_formatted = blob.time_created.astimezone(pst).strftime("%b %-d, %Y %-I:%M %p %Z")
+        title_text = creation_time_formatted.replace(":", "\\:")
         watermark_text = "fogcat5"
 
-        # Use a pipe to stream data between FFmpeg and the HTTP response
-        process = subprocess.Popen(
+        # Use FFmpeg to process the video and save to a file
+        subprocess.run(
             [
                 "ffmpeg",
-                "-i", "pipe:0",  # Input from stdin
+                "-i", local_path,  # Input file
                 "-vf",
                 f"drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10," \
                 f"drawtext=text='{watermark_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
                 "-c:v", "libx264",
                 "-c:a", "aac",
                 "-movflags", "+faststart",
-                "-f", "mp4",
-                "pipe:1"  # Output to stdout
+                "-y", processed_path
             ],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            bufsize=10**6
+            check=True
         )
 
-        try:
-            # Stream the blob content into FFmpeg
-            with blob.open("rb") as blob_stream:
-                while chunk := blob_stream.read(1024 * 1024):  # Read in chunks
-                    process.stdin.write(chunk)
-                process.stdin.close()
-
-            # Stream FFmpeg's output to the HTTP response
-            for chunk in iter(lambda: process.stdout.read(1024 * 1024), b""):
-                yield chunk
-        except Exception as e:
-            logging.error(f"Error streaming video: {e}")
-        finally:
-            process.terminate()
-            process.wait()
-
-    return Response(generate(), content_type="video/mp4")
+        # Serve the processed video file
+        with open(processed_path, "rb") as video_file:
+            return Response(video_file.read(), content_type="video/mp4")
+    except Exception as e:
+        logging.error(f"Error processing video: {e}")
+        return Response(f"Error: {e}", status=500)
+    finally:
+        # Cleanup local files
+        if os.path.exists(local_path):
+            os.remove(local_path)
+        if os.path.exists(processed_path):
+            os.remove(processed_path)
 
 
 @app.route('/video_latest')
