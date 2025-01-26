@@ -54,7 +54,7 @@ def get_video_list() -> List[storage.Blob]:
     return blobs
 
 
-@cached(cache=TTLCache(maxsize=10, ttl=60))
+@cached(cache=TTLCache(maxsize=20, ttl=60))
 def send_video(blob: storage.Blob) -> Response:
     """
     Downloads the blob to local disk, processes it with FFmpeg, and serves the processed file.
