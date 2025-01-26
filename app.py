@@ -135,14 +135,6 @@ def send_video(blob: storage.Blob) -> Response:
             process.wait()
 
     return Response(generate(), content_type="video/mp4")
-        process_video_with_ffmpeg(local_path, processed_path, blob.time_created.strftime("%Y-%m-%d %H:%M:%S"))
-        with open(processed_path, "rb") as video_file:
-            return Response(video_file.read(), content_type="video/mp4")
-    finally:
-        if os.path.exists(local_path):
-            os.remove(local_path)
-        if os.path.exists(processed_path):
-            os.remove(processed_path)
 
 
 @app.route('/video_latest')
