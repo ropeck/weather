@@ -67,8 +67,6 @@ def send_video(blob: storage.Blob) -> Response:
         # Properly format the text arguments
         from pytz import timezone
         pst = timezone('America/Los_Angeles')
-        logging.info(str(blob.__dict__))
-        logging.info(blob.updated)
         creation_time_formatted = blob.time_created.astimezone(pst).strftime("%b %-d, %Y %-I:%M %p %Z")
         title_text = creation_time_formatted.replace(":", "\\:")
         watermark_text = "fogcat5"
