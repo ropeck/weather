@@ -55,43 +55,86 @@ def get_video_list() -> List[storage.Blob]:
 
 
 def send_video(blob: storage.Blob) -> Response:
-    def process_video_with_ffmpeg(input_path: str, output_path: str, blob_creation_time: str):
-        """
-        Processes the video using FFmpeg to add a title with the current date and time.
-        """
-        if not os.path.exists(input_path):
-            raise FileNotFoundError(f"Input file {input_path} does not exist.")
+    """
+    Streams the video from GCS with FFmpeg processing applied in real-time.
+    """
+    def generate():
+        # Properly format the text arguments
+        creation_time_formatted = blob.time_created.strftime("%I:%M %p %Z")
+        title_text = creation_time_formatted
+        watermark_text = "fogcat5"
 
-        title_text = blob_creation_time.replace(":", "\:").replace("'", "\'")
-        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-        if not os.path.exists(font_path):
-            raise FileNotFoundError(f"Font file not found at {font_path}. Please install the required font.")
+        # Use a pipe to stream data between FFmpeg and the HTTP response
+        process = subprocess.Popen(
+            [
+                "ffmpeg",
+                "-i", "pipe:0",  # Input from stdin
+                "-vf",
+                f"drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10," \
+                f"drawtext=text='{watermark_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
+                "-c:v", "libx264",
+                "-c:a", "aac",
+                "-movflags", "+faststart",
+                "-f", "mp4",
+                "pipe:1"  # Output to stdout
+            ],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=10**6
+        )
 
-        creation_time_formatted = datetime.strptime(blob_creation_time, "%Y-%m-%d %H:%M:%S").astimezone().strftime(
-            "%I:%M %p %Z")
+        try:
+            # Stream the blob content into FFmpeg
+            with blob.open("rb") as blob_stream:
+                while chunk := blob_stream.read(1024 * 1024):  # Read in chunks
+                    process.stdin.write(chunk)
+                process.stdin.close()
 
-        logging.info(f"Processing video {input_path} with FFmpeg to add title...")
-        command = [
-            "ffmpeg",
-            "-i", input_path,
-            "-vf", f"drawtext=text=\"{title_text}\":fontfile={font_path}:fontsize=24:fontcolor=white:x=10:y=10,drawtext=text=\"fogcat5\":fontfile={font_path}:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
-            "-c:v", "libx264",
-            "-c:a", "aac",
-            "-movflags", "+faststart",
-            "-y", output_path
-        ]
+            # Stream FFmpeg's output to the HTTP response
+            for chunk in iter(lambda: process.stdout.read(1024 * 1024), b""):
+                yield chunk
+        except Exception as e:
+            logging.error(f"Error streaming video: {e}")
+        finally:
+            process.terminate()
+            process.wait()
+        # Use a pipe to stream data between FFmpeg and the HTTP response
+        process = subprocess.Popen(
+            [
+                "ffmpeg",
+                "-i", "pipe:0",  # Input from stdin
+                "-vf", f"drawtext=text='Created at {blob.time_created.strftime('%I:%M %p %Z')}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10,"
+                       f"drawtext=text='fogcat5':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
+                "-c:v", "libx264",
+                "-c:a", "aac",
+                "-movflags", "+faststart",
+                "-f", "mp4",
+                "pipe:1"  # Output to stdout
+            ],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=10**6
+        )
 
-        process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        if process.returncode != 0:
-            logging.error(f"FFmpeg processing failed: {process.stderr.decode()}")
-            raise RuntimeError(f"FFmpeg processing failed: {process.stderr.decode()}")
+        try:
+            # Stream the blob content into FFmpeg
+            with blob.open("rb") as blob_stream:
+                while chunk := blob_stream.read(1024 * 1024):  # Read in chunks
+                    process.stdin.write(chunk)
+                process.stdin.close()
 
-        logging.info(f"Video processed successfully: {output_path}")
+            # Stream FFmpeg's output to the HTTP response
+            for chunk in iter(lambda: process.stdout.read(1024 * 1024), b""):
+                yield chunk
+        except Exception as e:
+            logging.error(f"Error streaming video: {e}")
+        finally:
+            process.terminate()
+            process.wait()
 
-    local_path = f"/tmp/{blob.name.replace('/', '_')}"
-    processed_path = f"/tmp/processed_{blob.name.replace('/', '_')}"
-    try:
-        blob.download_to_filename(local_path)
+    return Response(generate(), content_type="video/mp4")
         process_video_with_ffmpeg(local_path, processed_path, blob.time_created.strftime("%Y-%m-%d %H:%M:%S"))
         with open(processed_path, "rb") as video_file:
             return Response(video_file.read(), content_type="video/mp4")
