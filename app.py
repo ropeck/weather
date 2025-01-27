@@ -12,6 +12,7 @@ from datetime import datetime
 app = Flask(__name__)
 storage_client: storage.Client = storage.Client()
 BUCKET_NAME: str = os.environ.get('BUCKET_NAME', "fogcat-webcam")
+VIDEO_WORKING_DIR = os.environ.get('VIDEO_WORKING_DIR', "/app/video")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
@@ -54,39 +55,44 @@ def get_video_list() -> List[storage.Blob]:
     return blobs
 
 
-@cached(cache=TTLCache(maxsize=20, ttl=60))
 def send_video(blob: storage.Blob) -> Response:
     """
     Downloads the blob to local disk, processes it with FFmpeg, and serves the processed file.
+    If the file is already there, serve that without processing again.
     """
-    local_path = f"/tmp/{blob.name.replace('/', '_')}"
-    processed_path = f"/tmp/processed_{blob.name.replace('/', '_')}"
+    basename = f"{blob.name.replace('/', '_')}.mp4"
+    if not os.path.exists(VIDEO_WORKING_DIR):
+        os.makedirs(VIDEO_WORKING_DIR)
+    local_path = os.path.join(VIDEO_WORKING_DIR, basename)
+    processed_path = os.path.join(VIDEO_WORKING_DIR,
+                                  f"processed_{basename}")
     try:
-        # Download blob to local file
-        blob.download_to_filename(local_path)
+        if not os.path.exists(processed_path):
+            # Download blob to local file
+            blob.download_to_filename(local_path)
 
-        # Properly format the text arguments
-        from pytz import timezone
-        pst = timezone('America/Los_Angeles')
-        creation_time_formatted = blob.time_created.astimezone(pst).strftime("%b %-d, %Y %-I:%M %p %Z")
-        title_text = creation_time_formatted.replace(":", "\\:")
-        watermark_text = "fogcat5"
+            # Properly format the text arguments
+            from pytz import timezone
+            pst = timezone('America/Los_Angeles')
+            creation_time_formatted = blob.time_created.astimezone(pst).strftime("%b %-d, %Y %-I:%M %p %Z")
+            title_text = creation_time_formatted.replace(":", "\\:")
+            watermark_text = "fogcat5"
 
-        # Use FFmpeg to process the video and save to a file
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-i", local_path,  # Input file
-                "-vf",
-                f"drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10," \
-                f"drawtext=text='{watermark_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
-                "-c:v", "libx264",
-                "-c:a", "aac",
-                "-movflags", "+faststart",
-                "-y", processed_path
-            ],
-            check=True
-        )
+            # Use FFmpeg to process the video and save to a file
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-i", local_path,  # Input file
+                    "-vf",
+                    f"drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10," \
+                    f"drawtext=text='{watermark_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
+                    "-c:v", "libx264",
+                    "-c:a", "aac",
+                    "-movflags", "+faststart",
+                    "-y", processed_path
+                ],
+                check=True
+            )
 
         # Serve the processed video file
         with open(processed_path, "rb") as video_file:
@@ -95,11 +101,10 @@ def send_video(blob: storage.Blob) -> Response:
         logging.error(f"Error processing video: {e}")
         return Response(f"Error: {e}", status=500)
     finally:
-        # Cleanup local files
+        # Cleanup local files, but leave the processed file as cache
+        # to be cleaned up by cron after 24 hrs
         if os.path.exists(local_path):
             os.remove(local_path)
-        if os.path.exists(processed_path):
-            os.remove(processed_path)
 
 
 @app.route('/video_latest')

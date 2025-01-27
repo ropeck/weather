@@ -1,6 +1,11 @@
 # Use a lightweight Python base image
 FROM python:3.9-slim-bullseye
 
+# Set the default timezone to Pacific
+RUN ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime && \
+    echo "America/Los_Angeles" > /etc/timezone
+
+
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     procps \
@@ -21,6 +26,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+
+# Add the cron job to execute sun.py every day at 5 AM before sunrise
+RUN echo "0 * * * * /app/expire_video_cache.py" | crontab -
 
 # Set the working directory
 WORKDIR /app
