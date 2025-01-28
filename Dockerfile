@@ -37,6 +37,9 @@ RUN curl https://sdk.cloud.google.com | bash && \
     echo "installed"
 ENV PATH="$PATH:/home/appuser/google-cloud-sdk/bin"
 
+# pass the service account auth details to upload cached results
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/service-account-key.json
+
 # Expose the port the app runs on
 EXPOSE 5000
 
