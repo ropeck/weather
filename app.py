@@ -45,11 +45,11 @@ def video(subpath: str) -> Response:
     return send_video(blob)
 
 
-@cached(cache=TTLCache(maxsize=100, ttl=600))
 def get_video_list() -> List[storage.Blob]:
-    # Access the GCS bucket
-    bucket = storage_client.get_bucket(BUCKET_NAME)
-    blobs: List[storage.Blob] = [x for x in list(bucket.list_blobs()) if "frames" not in x.name]
+    # Access the GCS bucket with collected videos
+    # Example: "2025/01/seacliff"
+    prefix = datetime.now().strftime("%Y/%m/seacliff")
+    blobs = storage_client.list_blobs(BUCKET_NAME, prefix=prefix)
     if not blobs:
         raise ValueError("No videos found in the bucket.")
     return blobs
