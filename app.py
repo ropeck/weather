@@ -68,6 +68,14 @@ def send_video(blob: storage.Blob) -> Response:
     bucket = storage_client.bucket(BUCKET_NAME)
     cached_blob = bucket.blob(gcs_cache_path)
 
+    # Local paths for temporary processing
+    basename = f"{blob.name.replace('/', '_')}.mp4"
+    if not os.path.exists(VIDEO_WORKING_DIR):
+        os.makedirs(VIDEO_WORKING_DIR)
+    local_path = os.path.join(VIDEO_WORKING_DIR, basename)
+    processed_path = os.path.join(VIDEO_WORKING_DIR, f"processed_{basename}")
+
+
     try:
         # Check if the processed video is already in GCS
         if cached_blob.exists():
@@ -76,13 +84,7 @@ def send_video(blob: storage.Blob) -> Response:
             processed_video_content = cached_blob.download_as_bytes()
             return Response(processed_video_content, content_type="video/mp4")
 
-        # Local paths for temporary processing
-        basename = f"{blob.name.replace('/', '_')}.mp4"
-        if not os.path.exists(VIDEO_WORKING_DIR):
-            os.makedirs(VIDEO_WORKING_DIR)
-        local_path = os.path.join(VIDEO_WORKING_DIR, basename)
-        processed_path = os.path.join(VIDEO_WORKING_DIR, f"processed_{basename}")
-
+        # not in cache, create the overlayed video and upload to cache
         # Download blob to local file
         blob.download_to_filename(local_path)
 
