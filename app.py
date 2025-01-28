@@ -1,13 +1,13 @@
 #!/usr/local/bin/python
 
+from datetime import datetime
 from flask import Flask, render_template, Response, send_from_directory, jsonify
-from cachetools import cached, TTLCache
 from google.cloud import storage
 from typing import List
-import os
 import logging
+import os
 import subprocess
-from datetime import datetime
+import traceback
 
 app = Flask(__name__)
 storage_client: storage.Client = storage.Client()
@@ -62,6 +62,7 @@ def send_video(blob: storage.Blob) -> Response:
     """
     # Define GCS paths
     gcs_cache_path = f"cache/{blob.name.replace('/', '_')}.mp4"
+    logging.info(f"cache path {gcs_cache_path}")
 
     # Initialize GCS client and bucket
     bucket = storage_client.bucket(BUCKET_NAME)
@@ -117,8 +118,10 @@ def send_video(blob: storage.Blob) -> Response:
             return Response(video_file.read(), content_type="video/mp4")
 
     except Exception as e:
-        logging.error(f"Error processing video: {e}")
-        return Response(f"Error: {e}", status=500)
+        tb = traceback.format_exc()
+        error_message = f"{str(e)}{tb}"
+        logging.error(f"Error processing video: {error_message}")
+        return Response(f"Error: {error_message}", status=500)
     finally:
         # Cleanup local files
         if os.path.exists(local_path):
