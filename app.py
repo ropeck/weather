@@ -54,57 +54,77 @@ def get_video_list() -> List[storage.Blob]:
         raise ValueError("No videos found in the bucket.")
     return blobs
 
-
 def send_video(blob: storage.Blob) -> Response:
     """
-    Downloads the blob to local disk, processes it with FFmpeg, and serves the processed file.
-    If the file is already there, serve that without processing again.
+    Checks GCS for a cached processed video.
+    If not present, downloads the blob, processes it with FFmpeg, uploads the processed file to GCS,
+    and serves the video content back.
     """
-    basename = f"{blob.name.replace('/', '_')}.mp4"
-    if not os.path.exists(VIDEO_WORKING_DIR):
-        os.makedirs(VIDEO_WORKING_DIR)
-    local_path = os.path.join(VIDEO_WORKING_DIR, basename)
-    processed_path = os.path.join(VIDEO_WORKING_DIR,
-                                  f"processed_{basename}")
+    # Define GCS paths
+    gcs_cache_path = f"cache/{blob.name.replace('/', '_')}.mp4"
+
+    # Initialize GCS client and bucket
+    bucket = storage_client.bucket(BUCKET_NAME)
+    cached_blob = bucket.blob(gcs_cache_path)
+
     try:
-        if not os.path.exists(processed_path):
-            # Download blob to local file
-            blob.download_to_filename(local_path)
+        # Check if the processed video is already in GCS
+        if cached_blob.exists():
+            # Serve the cached processed video from GCS
+            logging.info(f"Serving cached video from GCS: {gcs_cache_path}")
+            processed_video_content = cached_blob.download_as_bytes()
+            return Response(processed_video_content, content_type="video/mp4")
 
-            # Properly format the text arguments
-            from pytz import timezone
-            pst = timezone('America/Los_Angeles')
-            creation_time_formatted = blob.time_created.astimezone(pst).strftime("%b %-d, %Y %-I:%M %p %Z")
-            title_text = creation_time_formatted.replace(":", "\\:")
-            watermark_text = "fogcat5"
+        # Local paths for temporary processing
+        basename = f"{blob.name.replace('/', '_')}.mp4"
+        if not os.path.exists(VIDEO_WORKING_DIR):
+            os.makedirs(VIDEO_WORKING_DIR)
+        local_path = os.path.join(VIDEO_WORKING_DIR, basename)
+        processed_path = os.path.join(VIDEO_WORKING_DIR, f"processed_{basename}")
 
-            # Use FFmpeg to process the video and save to a file
-            subprocess.run(
-                [
-                    "ffmpeg",
-                    "-i", local_path,  # Input file
-                    "-vf",
-                    f"drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10," \
-                    f"drawtext=text='{watermark_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
-                    "-c:v", "libx264",
-                    "-c:a", "aac",
-                    "-movflags", "+faststart",
-                    "-y", processed_path
-                ],
-                check=True
-            )
+        # Download blob to local file
+        blob.download_to_filename(local_path)
+
+        # Properly format the text arguments
+        from pytz import timezone
+        pst = timezone('America/Los_Angeles')
+        creation_time_formatted = blob.time_created.astimezone(pst).strftime("%b %-d, %Y %-I:%M %p %Z")
+        title_text = creation_time_formatted.replace(":", "\\:")
+        watermark_text = "fogcat5"
+
+        # Use FFmpeg to process the video and save to a file
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-i", local_path,  # Input file
+                "-vf",
+                f"drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10," \
+                f"drawtext=text='{watermark_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
+                "-c:v", "libx264",
+                "-c:a", "aac",
+                "-movflags", "+faststart",
+                "-y", processed_path
+            ],
+            check=True
+        )
+
+        # Upload the processed file to GCS
+        cached_blob.upload_from_filename(processed_path)
+        logging.info(f"Uploaded processed video to GCS: {gcs_cache_path}")
 
         # Serve the processed video file
         with open(processed_path, "rb") as video_file:
             return Response(video_file.read(), content_type="video/mp4")
+
     except Exception as e:
         logging.error(f"Error processing video: {e}")
         return Response(f"Error: {e}", status=500)
     finally:
-        # Cleanup local files, but leave the processed file as cache
-        # to be cleaned up by cron after 24 hrs
+        # Cleanup local files
         if os.path.exists(local_path):
             os.remove(local_path)
+        if os.path.exists(processed_path):
+            os.remove(processed_path)
 
 
 @app.route('/video_latest')

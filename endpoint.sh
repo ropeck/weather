@@ -6,9 +6,6 @@ export TZ="America/Los_Angeles"
 touch /var/log/cron
 touch /var/log/camera-collector
 
-/etc/init.d/inetutils-syslogd start
-/usr/sbin/cron
-
 # Authenticate with Google Cloud using the service account key
 if [ -f "/app/service-account-key.json" ]; then
   gcloud auth activate-service-account --key-file=/app/service-account-key.json

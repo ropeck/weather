@@ -12,8 +12,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     inetutils-syslogd \
     curl \
     ffmpeg \
-    cron \
-    at \
     tzdata && \
     pip install --no-cache-dir \
     yt-dlp \
@@ -26,9 +24,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-
-# Add the cron job to execute sun.py every day at 5 AM before sunrise
-RUN echo "0 * * * * /app/expire_video_cache.py" | crontab -
 
 # Set the working directory
 WORKDIR /app
