@@ -3,6 +3,7 @@
 from datetime import datetime
 from flask import Flask, render_template, Response, send_from_directory, jsonify
 from google.cloud import storage
+from pytz import timezone
 from typing import List
 import logging
 import os
@@ -54,6 +55,7 @@ def get_video_list() -> List[storage.Blob]:
         raise ValueError("No videos found in the bucket.")
     return blobs
 
+
 def send_video(blob: storage.Blob) -> Response:
     """
     Checks GCS for a cached processed video.
@@ -75,7 +77,6 @@ def send_video(blob: storage.Blob) -> Response:
     local_path = os.path.join(VIDEO_WORKING_DIR, basename)
     processed_path = os.path.join(VIDEO_WORKING_DIR, f"processed_{basename}")
 
-
     try:
         # Check if the processed video is already in GCS
         if cached_blob.exists():
@@ -89,25 +90,26 @@ def send_video(blob: storage.Blob) -> Response:
         blob.download_to_filename(local_path)
 
         # Properly format the text arguments
-        from pytz import timezone
         pst = timezone('America/Los_Angeles')
         creation_time_formatted = blob.time_created.astimezone(pst).strftime("%b %-d, %Y %-I:%M %p %Z")
         title_text = creation_time_formatted.replace(":", "\\:")
         watermark_text = "fogcat5"
 
         # Use FFmpeg to process the video and save to a file
+        args = [
+            "ffmpeg",
+            "-i", local_path,  # Input file
+            "-vf",
+            f"drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10," \
+            f"drawtext=text='{watermark_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
+            "-c:v", "libx264",
+            "-c:a", "aac",
+            "-movflags", "+faststart",
+            "-y", processed_path
+        ]
+        logging.info(f"executing {" ".join(args)}")
         subprocess.run(
-            [
-                "ffmpeg",
-                "-i", local_path,  # Input file
-                "-vf",
-                f"drawtext=text='{title_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=10:y=10," \
-                f"drawtext=text='{watermark_text}':fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:fontsize=24:fontcolor=white:x=w-tw-10:y=10",
-                "-c:v", "libx264",
-                "-c:a", "aac",
-                "-movflags", "+faststart",
-                "-y", processed_path
-            ],
+            args,
             check=True
         )
 
