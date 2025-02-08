@@ -107,7 +107,7 @@ def send_video(blob: storage.Blob) -> Response:
             "-movflags", "+faststart",
             "-y", processed_path
         ]
-        logging.info(f"executing {" ".join(args)}")
+        logging.info(f"executing {' '.join(args)}")
         subprocess.run(
             args,
             check=True
