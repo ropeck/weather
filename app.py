@@ -7,8 +7,10 @@ from pytz import timezone
 from typing import List
 import logging
 import os
+import re
 import subprocess
 import traceback
+
 
 app = Flask(__name__)
 storage_client: storage.Client = storage.Client()
@@ -38,6 +40,41 @@ def index() -> str:
     # Replace with actual GCS logic
     videos = get_video_list()
     return render_template('index.html', videos=videos)
+
+
+@app.route('/api')
+def api() -> str:
+    res = []
+    for video in get_video_list():
+        # Extract components
+        match = re.search(r'(\d{4})/(\d{2})/(.*)-(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})-\d{2}-(\d{4})\.mp4', video.id)
+
+        if match:
+            year, month, location, date_time_part, timezone_part = match.groups()
+
+            # Construct timestamp string without the unknown `-XX`
+            timestamp_str = f"{date_time_part}-{timezone_part}"
+
+            try:
+                print(video.id)
+                dt = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M%z")
+                timestamp_iso = dt.astimezone(timezone('UTC')).isoformat(timespec='seconds').replace('+00:00', 'Z')
+            except ValueError as e:
+                print(f"Timestamp parsing failed for {timestamp_str}: {e}")
+                continue  # Skip this entry if parsing fails
+
+            # Correctly formatted URL preserving original structure
+            video_url = f"https://weather.fogcat5.com/collector/video/{year}/{month}/seacliff-{date_time_part}-01-{timezone_part}.mp4"
+
+            res.append({
+                'id': video.id,
+                'timestamp': timestamp_iso,
+                'url': video_url,
+                'location': location,
+            })
+    res.reverse()
+
+    return jsonify(res), 200
 
 
 @app.route('/video/<path:subpath>')
