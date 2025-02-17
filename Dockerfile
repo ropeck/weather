@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     astral \
     pytz \
     flask \
+    flask_cors \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
