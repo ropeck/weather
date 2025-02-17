@@ -50,10 +50,10 @@ def api() -> str:
     res = []
     for video in get_video_list():
         # Extract components
-        match = re.search(r'(\d{4})/(\d{2})/(.*)-(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})-\d{2}-(\d{4})\.mp4', video.id)
+        match = re.search(r'(\d{4})/(\d{2})/(.*)-(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})-(\d{2})-(\d{4})\.mp4', video.id)
 
         if match:
-            year, month, location, date_time_part, timezone_part = match.groups()
+            year, month, location, date_time_part, seg_part, timezone_part = match.groups()
 
             # Construct timestamp string without the unknown `-XX`
             timestamp_str = f"{date_time_part}-{timezone_part}"
@@ -67,7 +67,7 @@ def api() -> str:
                 continue  # Skip this entry if parsing fails
 
             # Correctly formatted URL preserving original structure
-            video_url = f"https://weather.fogcat5.com/collector/video/{year}/{month}/seacliff-{date_time_part}-01-{timezone_part}.mp4"
+            video_url = f"https://weather.fogcat5.com/collector/video/{year}/{month}/seacliff-{date_time_part}-{seg_part}-{timezone_part}.mp4"
 
             res.append({
                 'id': video.id,
