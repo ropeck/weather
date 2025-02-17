@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from flask import Flask, render_template, Response, send_from_directory, jsonify
+from flask_cors import CORS
 from google.cloud import storage
 from pytz import timezone
 from typing import List
@@ -13,6 +14,8 @@ import traceback
 
 
 app = Flask(__name__)
+CORS(app)  # This enables CORS for all routes
+
 storage_client: storage.Client = storage.Client()
 BUCKET_NAME: str = os.environ.get('BUCKET_NAME', "fogcat-webcam")
 VIDEO_WORKING_DIR = os.environ.get('VIDEO_WORKING_DIR', "/app/video")
