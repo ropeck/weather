@@ -333,7 +333,7 @@ if __name__ == "__main__":
             else :
                 pass
             exit()
-        except Exception as e:
+        except ValueError as e:
             current_time = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
             print("PROBLEM OCCURRED WHILE REFRESHING - NEXT TRY 1000s - @" + current_time)
             print(str(e))

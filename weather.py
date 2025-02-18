@@ -22,10 +22,10 @@ class Weather:
         self.weather_api_key = weather_api_key
         self.api_key_wunderground = wunderground_api_key
         self.update()
-        self.forecast = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]
-        self.forecast[0] = self.data["daily"][0]["dt"]
-        self.forecast[1][6] = [self.data["daily"][0]["pressure"],
-                               round(self.data["daily"][0]["temp"]["day"], 0)]
+        # self.forecast = [0, [[0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0], [0, 0]]]
+        # self.forecast[0] = self.data["daily"][0]["dt"]
+        # self.forecast[1][6] = [self.data["daily"][0]["pressure"],
+        #                        round(self.data["daily"][0]["temp"]["day"], 0)]
 
     def station_daily_rain(self):
         return round(self.station_data["observations"][0]["imperial"]["precipTotal"], 2)
@@ -52,6 +52,7 @@ class Weather:
         self.lat = obs["lat"]
         self.longitude = obs["lon"]
         self.data = self.forecast_api_call(self.lat, self.longitude, self.weather_api_key)
+        self.data["current"] = self.data["list"][0]
         return self.data
 
     def weather_api_json(self, api_path):
@@ -60,6 +61,7 @@ class Weather:
         return self.get_api_method_json(api_url)
 
     def get_api_method_json(self, api_url):
+        print(f"getting url: {api_url}")
         response = requests.get(api_url)
         if response.status_code != 200:
             raise ValueError(f"status code {response.status_code} in {api_url} -- {response.text}")
@@ -97,7 +99,7 @@ class Weather:
     # https://api.weather.com/v2/pws/dailysummary/7day?stationId=KCAAPTOS92&format=json&units=e&apiKey=5bb5ecb88c674ef9b5ecb88c67def9fb&numericPrecision=decimal
 
     def forecast_api_call(self, lat, lon, api_key):
-        forecast_api = f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid={api_key}&units=imperial"
+        forecast_api = f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=imperial"
         return self.get_api_method_json(forecast_api)
 
     def station_data_api_call(self):
@@ -163,7 +165,8 @@ class Weather:
     #          windGust FLOAT, pressure FLOAT, precipRate FLOAT, precipTotal FLOAT);
     #
     def current_time(self):
-        return time.strftime("%d/%m/%Y %H:%M", time.localtime(self.data["current"]["dt"]))
+        return time.strftime("%d/%m/%Y %H:%M", time.localtime())
+        # return time.strftime("%d/%m/%Y %H:%M", time.localtime(self.data["current"]["dt"]))
 
     def current_temp(self):
         return "{:.0f}".format(self.data["current"]["temp"]) + "F"
