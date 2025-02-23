@@ -67,7 +67,7 @@ spec:
           service:
             name: weather-service
             port:
-              number: 80
+              number: 8080
   - host: api.fogcat5.com
     http:
       paths:
