@@ -18,7 +18,7 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-EXPOSE 80
+EXPOSE 8080
 
 #CMD ["/bin/bash", "-c", "nginx && python weather_station.py"]
 #CMD ["/bin/bash", "-c", "lsof -i :80; while (true); do echo 'sleeping'; sleep 100; done"]
